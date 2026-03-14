@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@theme {
+  /* Siber Renk Paletimiz */
+  --color-cyber-black: #050505;
+  --color-cyber-dark: #0a0a0a;
+  --color-cyber-green: #00ff9d;
+  --color-cyber-blue: #00e1ff;
+  --color-cyber-red: #ff3333;
+  --color-cyber-yellow: #ffb700;
+  --color-cyber-purple: #bd00ff;
+
+  --animate-neon-pulse: neon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scanline: scanline 4s linear infinite;
+
+  @keyframes neon-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  @keyframes scanline {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+  }
+}
+
+:root {
+  --font-body: "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Eurostile", "Avenir Next Condensed", "Segoe UI", sans-serif;
+}
+
+/* @apply KULLANMADAN SAF CSS İLE YAZILMIŞ ANA KURALLAR */
+body {
+  background-color: var(--color-cyber-black);
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+  background-size: 40px 40px;
+  font-family: var(--font-body);
+}
+
+.glass-panel {
+  background-color: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+}
+
+.neon-border-green {
+  border-color: rgba(0, 255, 157, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+  transition: all 0.3s ease;
+}
+.neon-border-green:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.4);
+}
+
+.neon-border-red {
+  border-color: rgba(255, 51, 51, 0.5);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+  transition: all 0.3s ease;
+}
+.neon-border-red:hover {
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+}
+
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+}
+
+.terminal-line {
+  font-family: monospace;
+  font-size: 0.875rem;
+  padding: 0.25rem 0 0.25rem 0.5rem;
+  border-left: 2px solid transparent;
+  transition: background-color 0.2s;
+}
+.terminal-line:hover { background-color: rgba(255, 255, 255, 0.05); }
+.terminal-success { border-color: var(--color-cyber-green); color: var(--color-cyber-green); }
+.terminal-error { border-color: var(--color-cyber-red); color: var(--color-cyber-red); }
+.terminal-info { border-color: var(--color-cyber-blue); color: var(--color-cyber-blue); }
+
+.btn-cyber-primary {
+  background-color: rgba(0, 255, 157, 0.1);
+  border: 1px solid rgba(0, 255, 157, 0.5);
+  color: var(--color-cyber-green);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+.btn-cyber-primary:hover {
+  background-color: rgba(0, 255, 157, 0.2);
+  box-shadow: 0 0 25px rgba(0, 255, 157, 0.4);
+}
+.btn-cyber-primary:active {
+  transform: scale(0.95);
+}

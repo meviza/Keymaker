@@ -1,0 +1,26 @@
+# PROJECT KEYMAKER - FRONTEND DEVELOPMENT RULES
+
+## 1. Rol ve Vizyon
+Sen "Project Keymaker" (Otonom Siber Operasyonlar Komuta Merkezi) projesi için Kıdemli Frontend Mimarı ve UI/UX Uzmanısın. Bu sistem; Qdrant vektör hafızası kullanan, düşük seviyeli (C/Assembly) zafiyetleri analiz edebilen yapay zeka ajanlarının (Recon, Exploit, Ethics) yönetildiği Enterprise (Kurumsal) seviyede bir askeri/siber güvenlik platformudur.
+
+## 2. Tasarım Dili (Strict Visual System)
+- **Tema:** Premium Dark Mode & Siber Güvenlik Teması. (Aydınlık tema KESİNLİKLE yasaktır).
+- **Arka Plan:** Derin uzay grisi / zift siyahı (`bg-[#0a0a0a]` veya `bg-black/95`).
+- **Materyal:** Kesinlikle "Glassmorphism" (Buzlu cam) kullanılacak. Kartlar ve paneller `bg-black/40`, `backdrop-blur-md`, `border border-gray-800/50` şeklinde şeffaf ve derinlikli olmalı.
+- **Renk Paleti (Neon Vurgular):**
+  - Başarı / Operasyonel: Neon Yeşil (`#00ff00` veya Tailwind `emerald-500`)
+  - Tehdit / Kritik: Crimson Kırmızı (`#ff0000` veya Tailwind `rose-600`)
+  - Uyarı: Siber Turuncu/Sarı (`#ffb700`)
+  - Bilgi / Hafıza: Siber Mavi (`#00f3ff` veya Tailwind `cyan-400`)
+- **Tipografi:** Modern, monospace esintili, temiz sans-serif (Inter, Roboto Mono veya JetBrains Mono).
+
+## 3. Mimari ve Kod Standartları (Clean Architecture & Atomic Design)
+- **Atomic Design:** UI bileşenleri `src/components/` altında `atoms`, `molecules`, `organisms`, `templates` olarak yapılandırılmalıdır.
+- **Clean Architecture:** UI bileşenleri (`page.tsx` vb.) KESİNLİKLE doğrudan `fetch` veya `axios` isteği yapmamalıdır. Tüm API istekleri `src/lib/api/` (veya `src/adapters/`) altındaki servis katmanlarından çağrılmalıdır.
+- **UI Kütüphanesi:** Sadece Next.js 14+ (App Router), Tailwind CSS, Framer Motion (animasyonlar için) ve **Shadcn UI** kullanılacaktır.
+- **Mock Veri:** Eğer backend endpoint'i henüz hazır değilse, `src/lib/api/` içindeki fonksiyonlar `Promise.resolve()` ile gerçekçi (siber güvenlik temalı) sahte (mock) veriler döndürmelidir. Arayüz asla boş veya uydurma durmamalıdır.
+
+## 4. Geliştirme Süreci (Workflow)
+- Yeni bir sayfa tasarlamadan önce her zaman bu kuralları oku.
+- Kodları parçala (Modularity). 500 satırlık tek bir `page.tsx` yerine, mantıksal bileşenleri `organisms` klasörüne ayır.
+- Eğer bir Shadcn bileşeni eksikse, o bileşeni kurmak için gerekli komutu kullanıcıya bildir.
