@@ -16,24 +16,24 @@ import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { aiAgents, differentiators, roadmapModules, serviceCatalog } from "@/components/marketing/site-content";
 
 const stats = [
-  { value: "24/7", label: "Surekli analiz ve izleme" },
-  { value: "Code to Cloud", label: "Kaynak koddan runtime'a kadar gorunurluk" },
-  { value: "AI + Human", label: "Teknik ve yari teknik karar destek modeli" },
-  { value: "Policy First", label: "Onay, etik ve uyum kontrollu otomasyon" },
+  { value: "24/7", label: "Sürekli analiz ve izleme" },
+  { value: "Code to Cloud", label: "Kaynak koddan runtime'a kadar görünürlük" },
+  { value: "AI + Human", label: "Teknik ve yarı teknik karar destek modeli" },
+  { value: "Policy First", label: "Onay, etik ve uyum kontrollü otomasyon" },
 ];
 
 const phases = [
   {
-    name: "Bugun",
-    text: "Mevcut kod tabani; backend servisleri, CTI/RAG, ajan donguleri, gorev motoru ve operasyon arayuzu ile erken urunlesmis platform asamasinda.",
+    name: "Bugün",
+    text: "Mevcut kod tabanı; backend servisleri, CTI/RAG, ajan döngüleri, görev motoru ve operasyon arayüzü ile erken ürünleşmiş platform aşamasında.",
   },
   {
-    name: "Sonraki Adim",
-    text: "Bulgu uretiminden dogrulanabilir duzeltmeye gecis: patch orchestration, guvenlikli refactor ve test otomasyonu.",
+    name: "Sonraki Adım",
+    text: "Bulgu üretiminden doğrulanabilir düzeltmeye geçiş: patch orchestration, güvenlikli refactor ve test otomasyonu.",
   },
   {
     name: "Hedef Durum",
-    text: "Bulut tabanli, cok kiracili, self-service ama policy-governed enterprise guvenlik isletim sistemi.",
+    text: "Bulut tabanlı, çok kiracılı, self-service ama policy-governed enterprise güvenlik işletim sistemi.",
   },
 ];
 
@@ -50,25 +50,25 @@ export function MarketingHome() {
               Enterprise Agentic Security Platform
             </div>
             <h1 className="mt-6 max-w-5xl font-[family:var(--font-display)] text-6xl leading-[0.94] text-stone-50 md:text-8xl">
-              Sadece acigi gosteren degil,
-              <span className="block text-amber-200">onu kapatmayi da yoneten</span>
-              guvenlik isletim sistemi.
+              Sadece açığı gösteren değil,
+              <span className="block text-amber-200">onu kapatmayı da yöneten</span>
+              güvenlik işletim sistemi.
             </h1>
             <p className="mt-8 max-w-3xl text-lg leading-8 text-stone-300 md:text-xl">
-              Keymaker; saldiri yuzeyini, kod risklerini, bulut yanlis yapilandirmalarini ve operasyonel zafiyetleri tek ekranda
-              toplar. Sonra bunu durdurmaz: duzeltme onerisi, refactoring plani, test kapsami ve guvenli release akisi uretir.
+              Keymaker; saldırı yüzeyini, kod risklerini, bulut yanlış yapılandırmalarını ve operasyonel zafiyetleri tek ekranda
+              toplar. Sonra bunu durdurmaz: düzeltme önerisi, refactoring planı, test kapsamı ve güvenli release akışı üretir.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link href="/demo" className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-200 px-6 py-3 text-sm font-semibold text-stone-950">
                 Demo Talep Et <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/services" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-stone-100">
-                Hizmetleri Incele <ChevronRight className="h-4 w-4" />
+                Hizmetleri İncele <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="mt-10 flex flex-wrap gap-6 text-sm text-stone-400">
               <div className="inline-flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-200" /> Palo Alto ve CrowdStrike kategorilerini tek akista birlestiren daha butunlesik bir yaklasim
+                <ShieldCheck className="h-4 w-4 text-emerald-200" /> Palo Alto ve CrowdStrike kategorilerini tek akışta birleştiren daha bütünleşik bir yaklaşım
               </div>
               <div className="inline-flex items-center gap-2">
                 <FileDiff className="h-4 w-4 text-amber-200" /> Diagnose, advise, patch, validate
@@ -95,8 +95,8 @@ export function MarketingHome() {
             <div className="mt-6 rounded-2xl border border-amber-200/20 bg-amber-200/10 p-5">
               <div className="text-xs uppercase tracking-[0.24em] text-amber-100">Why this matters</div>
               <p className="mt-3 text-sm leading-7 text-stone-200">
-                Enterprise ekipler artik sadece gorunurluk degil, guvenli kapatma kapasitesi istiyor. Keymaker bu boslugu doldurmak
-                icin tasarlaniyor: tespit, dogrulama, duzeltme ve sureklilik.
+                Enterprise ekipler artık sadece görünürlük değil, güvenli kapatma kapasitesi istiyor. Keymaker bu boşluğu doldurmak
+                için tasarlanıyor: tespit, doğrulama, düzeltme ve süreklilik.
               </p>
             </div>
           </div>
@@ -109,7 +109,7 @@ export function MarketingHome() {
             <div key={phase.name} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
               <div className="text-xs uppercase tracking-[0.24em] text-stone-500">{phase.name}</div>
               <div className="mt-3 font-[family:var(--font-display)] text-2xl">
-                {phase.name === "Bugun" ? "Platformlasma" : phase.name === "Sonraki Adim" ? "Autofix" : "Cloud Scale"}
+                {phase.name === "Bugün" ? "Platformlaşma" : phase.name === "Sonraki Adım" ? "Autofix" : "Cloud Scale"}
               </div>
               <p className="mt-4 text-sm leading-7 text-stone-400">{phase.text}</p>
             </div>
@@ -138,10 +138,10 @@ export function MarketingHome() {
         <div className="flex items-end justify-between gap-8">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-stone-500">What we do now</div>
-            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Sundugumuz ve genislettigimiz hizmetler</h2>
+            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Sunduğumuz ve genişlettiğimiz hizmetler</h2>
           </div>
           <Link href="/services" className="hidden text-sm text-amber-200 md:inline-flex">
-            Tum katalog <ArrowRight className="ml-2 h-4 w-4" />
+            Tüm katalog <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -164,7 +164,7 @@ export function MarketingHome() {
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-[2rem] border border-white/10 bg-[#0b1512] p-8">
             <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Next wave</div>
-            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Gelistirilecek moduller ve yenilikci fikirler</h2>
+            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Geliştirilecek modüller ve yenilikçi fikirler</h2>
             <div className="mt-8 space-y-5">
               {roadmapModules.map((item) => {
                 const Icon = item.icon;
@@ -183,7 +183,7 @@ export function MarketingHome() {
 
           <div className="rounded-[2rem] border border-white/10 bg-black/30 p-8">
             <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Multi-agent fabric</div>
-            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Entegre calisacak AI agent katmani</h2>
+            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Entegre çalışacak AI agent katmanı</h2>
             <div className="mt-8 space-y-5">
               {aiAgents.map((item) => {
                 const Icon = item.icon;
@@ -206,20 +206,20 @@ export function MarketingHome() {
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Commercial</div>
-            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Fiyatlandirma ve demo gorusmesi</h2>
+            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Fiyatlandırma ve demo görüşmesi</h2>
             <p className="mt-6 text-base leading-8 text-stone-400">
-              Burayi daha da gelistirecegiz. Rakipleri surekli analiz edip ozellik setini genisletecegiz; bu yuzden fiyatlama sabit paket yerine
-              ihtiyac ve entegrasyon yogunluguna gore yapilandiriliyor.
+              Bunu daha da geliştireceğiz. Rakipleri sürekli analiz edip özellik setini genişleteceğiz; bu yüzden fiyatlama sabit paket yerine
+              ihtiyaç ve entegrasyon yoğunluğuna göre yapılandırılıyor.
             </p>
             <div className="mt-8 space-y-3 text-sm text-stone-300">
               <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Demo, mimari kesif ve uygunluk degerlendirmesi
+                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Demo, mimari keşif ve uygunluk değerlendirmesi
               </div>
               <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Yonetilen hizmet veya urun lisansi secenekleri
+                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Yönetilen hizmet veya ürün lisansı seçenekleri
               </div>
               <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Kurum ici, private cloud veya sovereign deployment senaryolari
+                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Kurum içi, private cloud veya sovereign deployment senaryoları
               </div>
             </div>
           </div>
@@ -227,18 +227,18 @@ export function MarketingHome() {
             <div className="grid gap-5 md:grid-cols-2">
               <label className="text-sm text-stone-300">
                 Ad Soyad
-                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Isim Soyisim" />
+                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="İsim Soyisim" />
               </label>
               <label className="text-sm text-stone-300">
-                Sirket
-                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Sirket adi" />
+                Şirket
+                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Şirket adı" />
               </label>
               <label className="text-sm text-stone-300">
-                Is e-postasi
+                İş e-postası
                 <input value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="security@company.com" />
               </label>
               <label className="text-sm text-stone-300">
-                Ilgilendiginiz alan
+                İlgilendiğiniz alan
                 <select className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none">
                   <option>Autonomous AppSec</option>
                   <option>Cloud Security</option>
@@ -248,15 +248,15 @@ export function MarketingHome() {
               </label>
               <label className="text-sm text-stone-300 md:col-span-2">
                 Mesaj
-                <textarea className="mt-2 min-h-32 w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Hangi ekipler, hangi altyapi ve hangi oncelikler icin gorusmek istediginizi yazin." />
+                <textarea className="mt-2 min-h-32 w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Hangi ekipler, hangi altyapı ve hangi öncelikler için görüşmek istediğinizi yazın." />
               </label>
             </div>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row">
               <Link href={email ? `/demo?email=${encodeURIComponent(email)}` : "/demo"} className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-200 px-6 py-3 text-sm font-semibold text-stone-950">
-                Gorusme Baslat <ArrowRight className="h-4 w-4" />
+                Görüşme Başlat <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-stone-100">
-                Fiyatlandirma Detayi
+                Fiyatlandırma Detayı
               </Link>
             </div>
           </div>
@@ -267,23 +267,23 @@ export function MarketingHome() {
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
             <TowerControl className="h-6 w-6 text-amber-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Teknik reklam dili</div>
+            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Teknik mesaj</div>
             <p className="mt-3 text-sm leading-7 text-stone-400">
-              Event-driven servisler, agent orchestration, RAG hafiza, patch onerisi, guvenlik test otomasyonu ve kanit zinciri.
+              Event-driven servisler, agent orchestration, RAG hafıza, patch önerisi, güvenlik test otomasyonu ve kanıt zinciri.
             </p>
           </div>
           <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
             <Globe2 className="h-6 w-6 text-emerald-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Yari teknik reklam dili</div>
+            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Yarı teknik mesaj</div>
             <p className="mt-3 text-sm leading-7 text-stone-400">
-              Ekiplerinize sadece risk listesi degil, oncelik, iyilestirme plani ve guvenli buyume icin isletilebilir yol haritasi sunuyoruz.
+              Ekiplerinize sadece risk listesi değil, öncelik, iyileştirme planı ve güvenli büyüme için işletilebilir yol haritası sunuyoruz.
             </p>
           </div>
           <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
             <CheckCircle2 className="h-6 w-6 text-amber-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Surekli gelisim vaadi</div>
+            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Sürekli gelişim vaadi</div>
             <p className="mt-3 text-sm leading-7 text-stone-400">
-              Su anda baslamadiysak ilgili altyapiyi baslatiriz; basladiysak urunlestirip kurumsal olcekte nihayete erdiririz.
+              Şu anda başlamadıysak ilgili altyapıyı başlatırız; başladıysak ürünleştirip kurumsal ölçekte nihayete erdiririz.
             </p>
           </div>
         </div>

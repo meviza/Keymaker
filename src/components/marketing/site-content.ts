@@ -32,65 +32,65 @@ export type IconCard = {
 export const differentiators: IconCard[] = [
   {
     title: "Diagnose + Fix",
-    body: "Keymaker sadece sorun bulmaz; kod duzeltme onerileri, guvenlik sertlestirme adimlari ve refactoring backlog'u da uretir.",
+    body: "Keymaker sadece sorun bulmaz; kod düzeltme önerileri, güvenlik sertleştirme adımları ve refactoring backlog'u da üretir.",
     icon: Code2,
   },
   {
     title: "Agentic Security Fabric",
-    body: "Analyst, recon, patching, testing ve governance agent'lari ayni olay grafiginde koordineli calisir.",
+    body: "Analyst, recon, patching, testing ve governance agent'ları aynı olay grafiğinde koordineli çalışır.",
     icon: Bot,
   },
   {
     title: "Governed Autonomy",
-    body: "Ethics, scope, approval ve evidence akisleri operasyon motorunun icine gomuludur.",
+    body: "Ethics, scope, approval ve evidence akışları operasyon motorunun içine gömülüdür.",
     icon: Scale,
   },
   {
     title: "Cloud-Scale Architecture",
-    body: "Cok kiracili, event-driven ve bulut tabanli buyume icin servis, veri ve gozlemlenebilirlik sinirlari nettir.",
+    body: "Çok kiracılı, event-driven ve bulut tabanlı büyüme için servis, veri ve gözlemlenebilirlik sınırları nettir.",
     icon: CloudCog,
   },
 ];
 
 export const serviceCatalog: IconCard[] = [
   {
-    title: "Saldiri Yuzeyi ve ASM",
-    body: "Harici varlik envanteri, shadow IT, subdomain kesfi, internet maruziyeti ve surekli drift takibi.",
+    title: "Saldırı Yüzeyi ve ASM",
+    body: "Harici varlık envanteri, shadow IT, subdomain keşfi, internet maruziyeti ve sürekli drift takibi.",
     icon: Radar,
   },
   {
-    title: "Uygulama Guvenlik Analizi",
+    title: "Uygulama Güvenlik Analizi",
     body: "API, GraphQL, business logic, auth, input validation ve supply-chain kontrolleri.",
     icon: SearchCheck,
   },
   {
     title: "Kod Analizi ve Refactoring",
-    body: "Guvenlik kokulari, bakim maliyeti, surdurulebilirlik ve teknik borc icin kod seviyesinde iyilestirme onerileri.",
+    body: "Güvenlik kokuları, bakım maliyeti, sürdürülebilirlik ve teknik borç için kod seviyesinde iyileştirme önerileri.",
     icon: FileCode2,
   },
   {
     title: "Test Otomasyonu",
-    body: "Unit, integration, regression, security test ve risk odakli test uretimi.",
+    body: "Unit, integration, regression, security test ve risk odaklı test üretimi.",
     icon: TestTubeDiagonal,
   },
   {
-    title: "Tehdit Istihbarati ve RAG",
-    body: "CVE, KEV, OTX, CTI akislar ve yerel kurumsal hafizayi ayni baglam katmaninda birlestirme.",
+    title: "Tehdit İstihbaratı ve RAG",
+    body: "CVE, KEV, OTX, CTI akışlar ve yerel kurumsal hafızayı aynı bağlam katmanında birleştirme.",
     icon: BrainCircuit,
   },
   {
-    title: "Bulut ve Platform Sertlestirme",
-    body: "IAM, secret hygiene, runtime policy, eBPF, SIEM/SOAR ve Kubernetes guvenlik entegrasyonlari.",
+    title: "Bulut ve Platform Sertleştirme",
+    body: "IAM, secret hygiene, runtime policy, eBPF, SIEM/SOAR ve Kubernetes güvenlik entegrasyonları.",
     icon: ShieldCheck,
   },
   {
-    title: "Guvenli SDLC Altyapisi",
+    title: "Güvenli SDLC Altyapısı",
     body: "PR guardrails, code owners, branch policy, SBOM, policy-as-code ve release gates.",
     icon: Workflow,
   },
   {
-    title: "Managed Support ve Advisory",
-    body: "Yol haritasi, durum degerlendirmesi, CISO seviyesi raporlama ve teknik donusum danismanligi.",
+    title: "Managed Support ve Danışmanlık",
+    body: "Yol haritası, durum değerlendirmesi, CISO seviyesi raporlama ve teknik dönüşüm danışmanlığı.",
     icon: Handshake,
   },
 ];
@@ -98,32 +98,32 @@ export const serviceCatalog: IconCard[] = [
 export const roadmapModules: IconCard[] = [
   {
     title: "Patch Orchestrator",
-    body: "Bulunan aciklar icin dogrulanabilir patch set, PR onerisi ve rollback plani uretir.",
+    body: "Bulunan açıklar için doğrulanabilir patch set, PR önerisi ve rollback planı üretir.",
     icon: LockKeyhole,
   },
   {
     title: "Data Source Sanitizer",
-    body: "Tehdit istihbarati ve tarama ciktilarindaki zararli payload, PII ve zehirli ornekleri ayristirir.",
+    body: "Tehdit istihbaratı ve tarama çıktılarındaki zararlı payload, PII ve zehirli örnekleri ayıştırır.",
     icon: Fingerprint,
   },
   {
     title: "Knowledge Mesh",
-    body: "Kod deposu, runbook, incident postmortem ve CTI kaynaklarini tek sorgulanabilir bilgi katmaninda toplar.",
+    body: "Kod deposu, runbook, incident postmortem ve CTI kaynaklarını tek sorgulanabilir bilgi katmanında toplar.",
     icon: Layers3,
   },
   {
     title: "Autonomous QA Grid",
-    body: "Kod degisikliklerinden sonra guvenlik ve davranis regresyonlarini agent destekli test agiyla dogrular.",
+    body: "Kod değişikliklerinden sonra güvenlik ve davranış regresyonlarını agent destekli test ağıyla doğrular.",
     icon: Orbit,
   },
   {
     title: "Exploit Evidence Lab",
-    body: "Bulgu dogrulama, PoC izolasyonu ve delil uretimini kontrollu sandbox'larda yurutur.",
+    body: "Bulgu doğrulama, PoC izolasyonu ve delil üretimini kontrollü sandbox'larda yürütür.",
     icon: Bug,
   },
   {
     title: "Executive Trust Portal",
-    body: "Sozlesme, denetim izi, SLA, risk trendi ve iyilestirme ROI'sini is birimlerine acar.",
+    body: "Sözleşme, denetim izi, SLA, risk trendi ve iyileştirme ROI'sini iş birimlerine açar.",
     icon: BadgeCheck,
   },
 ];
@@ -131,22 +131,22 @@ export const roadmapModules: IconCard[] = [
 export const aiAgents: IconCard[] = [
   {
     title: "Recon Agent",
-    body: "Varlik kesfi, fingerprinting, hizmet haritalama ve onceliklendirme yapar.",
+    body: "Varlık keşfi, fingerprinting, hizmet haritalama ve önceliklendirme yapar.",
     icon: Radar,
   },
   {
     title: "Code Steward Agent",
-    body: "Kod bakimini, refactoring onerilerini ve guvenli patch taslaklarini yonetir.",
+    body: "Kod bakımını, refactoring önerilerini ve güvenli patch taslaklarını yönetir.",
     icon: Binary,
   },
   {
     title: "Validation Agent",
-    body: "Duzeltmeleri test eder, regresyon riskini puanlar ve deploy readiness karari uretir.",
+    body: "Düzeltmeleri test eder, regresyon riskini puanlar ve deploy readiness kararı üretir.",
     icon: ShieldEllipsis,
   },
   {
     title: "Support Copilot",
-    body: "Musteri talepleri, cozum onerileri ve teknik/yari teknik iletisimi standardize eder.",
+    body: "Müşteri talepleri, çözüm önerileri ve teknik/yarı teknik iletişimi standardize eder.",
     icon: LifeBuoy,
   },
 ];
@@ -155,19 +155,19 @@ export const pricingTiers = [
   {
     name: "Foundation",
     price: "Custom",
-    summary: "Hizli gorunurluk ve guvenlik hijyeni programi.",
-    bullets: ["Attack surface visibility", "Kod analizi ve raporlama", "Aylik risk review", "E-posta destek"],
+    summary: "Hızlı görünürlük ve güvenlik hijyeni programı.",
+    bullets: ["Attack surface visibility", "Kod analizi ve raporlama", "Aylık risk review", "E-posta destek"],
   },
   {
     name: "Enterprise",
     price: "Contact Sales",
-    summary: "Cok ekipli kurumlar icin agentic AppSec ve cloud security operasyonu.",
-    bullets: ["Surekli tarama ve triage", "Patch guidance + refactor roadmap", "CTI/RAG entegrasyonu", "Ozel onboarding ve SLA"],
+    summary: "Çok ekipli kurumlar için agentic AppSec ve cloud security operasyonu.",
+    bullets: ["Sürekli tarama ve triage", "Patch guidance + refactor roadmap", "CTI/RAG entegrasyonu", "Özel onboarding ve SLA"],
   },
   {
     name: "Sovereign",
     price: "Private Offer",
-    summary: "Yuksek regulasyonlu kurumlar icin ozel dagitim ve kontrollu otomasyon.",
-    bullets: ["Self-hosted veya sovereign cloud", "Custom agent policies", "Ozel veri kaynaklari", "Mimari danismanlik ve yonetilen program"],
+    summary: "Yüksek regülasyonlu kurumlar için özel dağıtım ve kontrollü otomasyon.",
+    bullets: ["Self-hosted veya sovereign cloud", "Custom agent policies", "Özel veri kaynakları", "Mimari danışmanlık ve yönetilen program"],
   },
 ];

@@ -7,9 +7,9 @@ import { useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/services", label: "Hizmetler" },
-  { href: "/pricing", label: "Fiyatlandirma" },
-  { href: "/support", label: "Support" },
-  { href: "/contact", label: "Iletisim" },
+  { href: "/pricing", label: "Fiyatlandırma" },
+  { href: "/support", label: "Destek" },
+  { href: "/contact", label: "İletişim" },
 ];
 
 const LEGAL_ITEMS = [
@@ -115,7 +115,7 @@ export function MarketingShell({
             <div>
               <div className="font-[family:var(--font-display)] text-2xl">Keymaker</div>
               <p className="mt-4 max-w-md text-sm leading-7 text-stone-400">
-                Agentic AppSec, cloud security ve guvenli yazilim yasam dongusunu tek bir isletim katmaninda birlestiren platform.
+                Agentic AppSec, cloud security ve güvenli yazılım yaşam döngüsünü tek bir işletim katmanında birleştiren platform.
               </p>
             </div>
             <div>
