@@ -8,6 +8,7 @@ import {
   Phone, CheckCircle2, Menu, Sun, Moon,
 } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const NAV_LINKS = [
   { href: "/", label: "Ana Sayfa" },
@@ -54,6 +55,7 @@ export default function ContactPage() {
   });
 
   const { theme, toggle } = useTheme();
+  const { locale, setLocale } = useLanguage();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,10 +94,12 @@ export default function ContactPage() {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Language toggle */}
             <button
-              onClick={() => {}}
+              onClick={() => setLocale(locale === "tr" ? "en" : "tr")}
               className="text-xs font-mono px-2 py-1 rounded border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
             >
-              TR
+              <span className={locale === "tr" ? "font-bold text-zinc-900 dark:text-white" : ""}>TR</span>
+              <span className="text-zinc-400 dark:text-zinc-600 mx-0.5">|</span>
+              <span className={locale === "en" ? "font-bold text-zinc-900 dark:text-white" : ""}>EN</span>
             </button>
             {/* Theme toggle */}
             <button

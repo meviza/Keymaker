@@ -17,6 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevent FOUC: apply saved theme class synchronously before first paint */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('km-theme');document.documentElement.classList.add(t==='light'?'light':'dark');}catch(e){document.documentElement.classList.add('dark');}})();` }} />
+      </head>
       <body className="flex min-h-screen overflow-x-hidden bg-white dark:bg-cyber-black font-[family:var(--font-body)]">
         <ThemeProvider>
           <LanguageProvider>

@@ -45,7 +45,7 @@ const TECH_STACK = [
   { icon: Server,   label: "Air-Gap",           desc: "İzole ortam" },
 ];
 
-function Cell({ val }: { val: boolean | string }) {
+function Cell({ val, locale }: { val: boolean | string; locale: string }) {
   if (val === true) return (
     <div className="flex justify-center">
       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyber-green/10">
@@ -54,8 +54,8 @@ function Cell({ val }: { val: boolean | string }) {
     </div>
   );
   if (val === false) return <div className="flex justify-center"><X className="w-4 h-4 text-zinc-400 dark:text-zinc-700" /></div>;
-  if (val === "partial") return <div className="text-center text-xs font-semibold text-amber-400">Kısıtlı</div>;
-  if (val === "soon") return <div className="text-center text-xs font-semibold text-cyber-blue">Yakında</div>;
+  if (val === "partial") return <div className="text-center text-xs font-semibold text-amber-400">{locale === "tr" ? "Kısıtlı" : "Partial"}</div>;
+  if (val === "soon") return <div className="text-center text-xs font-semibold text-cyber-blue">{locale === "tr" ? "Yakında" : "Soon"}</div>;
   return null;
 }
 
@@ -93,7 +93,7 @@ export function MarketingHome() {
               <div className="absolute inset-0 rounded-xl bg-cyber-green/20 border border-cyber-green/40 group-hover:bg-cyber-green/30 transition" />
               <Shield className="absolute inset-0 m-auto w-5 h-5 text-cyber-green" />
             </div>
-            <div className="hidden xs:block">
+            <div className="hidden sm:block">
               <div className="text-sm font-black tracking-widest text-zinc-900 dark:text-white leading-none">KEYMAKER</div>
               <div className="text-[8px] tracking-[0.25em] text-zinc-400 dark:text-zinc-600 uppercase">Cyber Security</div>
             </div>
@@ -406,9 +406,9 @@ export function MarketingHome() {
                 {COMPARISON.map((row, idx) => (
                   <tr key={row.feature.en} className={`border-b border-zinc-200 dark:border-white/[0.05] hover:bg-zinc-100/50 dark:hover:bg-white/[0.02] transition-colors ${idx % 2 !== 0 ? "bg-zinc-50 dark:bg-white/[0.01]" : ""}`}>
                     <td className="py-3 px-3 sm:px-6 text-zinc-700 dark:text-zinc-300 font-medium">{row.feature[locale]}</td>
-                    <td className="py-3 px-2 sm:px-4"><Cell val={row.keymaker} /></td>
-                    <td className="py-3 px-2 sm:px-4"><Cell val={row.paloalto} /></td>
-                    <td className="py-3 px-2 sm:px-4"><Cell val={row.crowdstrike} /></td>
+                    <td className="py-3 px-2 sm:px-4"><Cell val={row.keymaker} locale={locale} /></td>
+                    <td className="py-3 px-2 sm:px-4"><Cell val={row.paloalto} locale={locale} /></td>
+                    <td className="py-3 px-2 sm:px-4"><Cell val={row.crowdstrike} locale={locale} /></td>
                   </tr>
                 ))}
               </tbody>
