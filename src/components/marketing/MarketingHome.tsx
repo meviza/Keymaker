@@ -409,9 +409,9 @@ export function MarketingHome() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4">{i.enterprise.title}</h2>
               <p className="text-zinc-400 mb-8 sm:mb-10 max-w-xl mx-auto text-sm sm:text-base">{i.enterprise.subtitle}</p>
 
-              <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-10">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-w-xl mx-auto mb-8 sm:mb-10">
                 {i.enterprise.sectors.map((s) => (
-                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] text-xs sm:text-sm text-zinc-300">
+                  <span key={s} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 bg-white/[0.04] text-xs sm:text-sm text-zinc-300 text-center">
                     <ChevronRight className="w-3 h-3 text-cyber-green shrink-0" />
                     {s}
                   </span>
