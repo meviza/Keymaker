@@ -1,293 +1,444 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  CheckCircle2,
-  ChevronRight,
-  FileDiff,
-  Globe2,
-  ShieldCheck,
-  Sparkles,
-  TowerControl,
+  ArrowRight, Check, X, Shield, ShieldCheck, Eye, Brain, Zap,
+  Globe2, Download, Building2, Monitor, Laptop, Terminal,
+  Smartphone, Radio, Server, ChevronRight, Lock, Cpu, Activity
 } from "lucide-react";
-import { MarketingShell } from "@/components/marketing/MarketingShell";
-import { aiAgents, differentiators, roadmapModules, serviceCatalog } from "@/components/marketing/site-content";
+import { type Locale, t } from "@/lib/i18n";
 
-const stats = [
-  { value: "24/7", label: "Sürekli analiz ve izleme" },
-  { value: "Code to Cloud", label: "Kaynak koddan runtime'a kadar görünürlük" },
-  { value: "AI + Human", label: "Teknik ve yarı teknik karar destek modeli" },
-  { value: "Policy First", label: "Onay, etik ve uyum kontrollü otomasyon" },
+// ── Animation Variants ────────────────────────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+
+// ── Comparison Data ───────────────────────────────────────────────────────────
+const COMPARISON = [
+  { feature: { tr: "Kendini Geliştiren AI", en: "Self-Improving AI" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "AI Sürü (6 Ajan)", en: "AI Swarm (6 Agents)" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "Adversarial Self-Play", en: "Adversarial Self-Play" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "Prediktif CVE Tahmini", en: "Predictive CVE Forecasting" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "Veri Egemenliği (Lokal AI)", en: "Data Sovereignty (Local AI)" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "AI Honeypot (Deception)", en: "AI Honeypot (Deception)" }, keymaker: true, paloalto: false, crowdstrike: false },
+  { feature: { tr: "Supply Chain Tespiti", en: "Supply Chain Detection" }, keymaker: true, paloalto: "partial", crowdstrike: "partial" },
+  { feature: { tr: "Endpoint Agent", en: "Endpoint Agent" }, keymaker: true, paloalto: true, crowdstrike: true },
+  { feature: { tr: "MITRE ATT&CK Mapping", en: "MITRE ATT&CK Mapping" }, keymaker: true, paloalto: true, crowdstrike: true },
+  { feature: { tr: "Mobil Koruma", en: "Mobile Protection" }, keymaker: "soon", paloalto: false, crowdstrike: false },
 ];
 
-const phases = [
-  {
-    name: "Bugün",
-    text: "Mevcut kod tabanı; backend servisleri, CTI/RAG, ajan döngüleri, görev motoru ve operasyon arayüzü ile erken ürünleşmiş platform aşamasında.",
-  },
-  {
-    name: "Sonraki Adım",
-    text: "Bulgu üretiminden doğrulanabilir düzeltmeye geçiş: patch orchestration, güvenlikli refactor ve test otomasyonu.",
-  },
-  {
-    name: "Hedef Durum",
-    text: "Bulut tabanlı, çok kiracılı, self-service ama policy-governed enterprise güvenlik işletim sistemi.",
-  },
+const TECH_STACK = [
+  { icon: Brain, label: "AI Sürü Mimarisi", desc: "6 otonom ajan" },
+  { icon: Lock, label: "Adversarial Self-Play", desc: "AlphaGo yöntemi" },
+  { icon: Cpu, label: "Lokal AI İşleme", desc: "Veri egemenliği" },
+  { icon: Activity, label: "72s CVE Tahmini", desc: "Prediktif zeka" },
+  { icon: Radio, label: "7/24 Threat Hunt", desc: "Otonom avlanma" },
+  { icon: Server, label: "Air-Gap Destek", desc: "İzole ortam" },
 ];
 
+function Cell({ val }: { val: boolean | string }) {
+  if (val === true) return (
+    <div className="flex justify-center">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyber-green/10">
+        <Check className="w-3.5 h-3.5 text-cyber-green" />
+      </span>
+    </div>
+  );
+  if (val === false) return (
+    <div className="flex justify-center">
+      <X className="w-4 h-4 text-zinc-700" />
+    </div>
+  );
+  if (val === "partial") return <div className="text-center text-xs font-semibold text-amber-400">Kısıtlı</div>;
+  if (val === "soon") return <div className="text-center text-xs font-semibold text-cyber-blue">Yakında</div>;
+  return null;
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export function MarketingHome() {
-  const [email, setEmail] = useState("");
-  const highlightedServices = useMemo(() => serviceCatalog.slice(0, 6), []);
+  const [locale, setLocale] = useState<Locale>("tr");
+  const i = t(locale);
 
   return (
-    <MarketingShell>
-      <section className="mx-auto max-w-7xl px-6 pt-16 pb-24">
-        <div className="grid gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <div className="inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-emerald-100">
-              Enterprise Agentic Security Platform
-            </div>
-            <h1 className="mt-6 max-w-5xl font-[family:var(--font-display)] text-6xl leading-[0.94] text-stone-50 md:text-8xl">
-              Sadece açığı gösteren değil,
-              <span className="block text-amber-200">onu kapatmayı da yöneten</span>
-              güvenlik işletim sistemi.
-            </h1>
-            <p className="mt-8 max-w-3xl text-lg leading-8 text-stone-300 md:text-xl">
-              Keymaker; saldırı yüzeyini, kod risklerini, bulut yanlış yapılandırmalarını ve operasyonel zafiyetleri tek ekranda
-              toplar. Sonra bunu durdurmaz: düzeltme önerisi, refactoring planı, test kapsamı ve güvenli release akışı üretir.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href="/demo" className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-200 px-6 py-3 text-sm font-semibold text-stone-950">
-                Demo Talep Et <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/services" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-stone-100">
-                Hizmetleri İncele <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="mt-10 flex flex-wrap gap-6 text-sm text-stone-400">
-              <div className="inline-flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-200" /> Palo Alto ve CrowdStrike kategorilerini tek akışta birleştiren daha bütünleşik bir yaklaşım
-              </div>
-              <div className="inline-flex items-center gap-2">
-                <FileDiff className="h-4 w-4 text-amber-200" /> Diagnose, advise, patch, validate
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-cyber-black text-white overflow-x-hidden">
 
-          <div className="rounded-[2rem] border border-white/10 bg-black/35 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.45)]">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div>
-                <div className="text-sm uppercase tracking-[0.24em] text-stone-500">Boardroom Snapshot</div>
-                <div className="mt-1 font-[family:var(--font-display)] text-2xl">Security posture with actionability</div>
-              </div>
-              <Sparkles className="h-5 w-5 text-amber-200" />
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {stats.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="font-[family:var(--font-display)] text-3xl text-emerald-100">{item.value}</div>
-                  <div className="mt-2 text-sm leading-6 text-stone-400">{item.label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 rounded-2xl border border-amber-200/20 bg-amber-200/10 p-5">
-              <div className="text-xs uppercase tracking-[0.24em] text-amber-100">Why this matters</div>
-              <p className="mt-3 text-sm leading-7 text-stone-200">
-                Enterprise ekipler artık sadece görünürlük değil, güvenli kapatma kapasitesi istiyor. Keymaker bu boşluğu doldurmak
-                için tasarlanıyor: tespit, doğrulama, düzeltme ve süreklilik.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Ambient background ─────────────────────────────────────── */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-cyber-green/[0.04] blur-[120px] rounded-full" />
+        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-cyber-blue/[0.03] blur-[100px] rounded-full" />
+        <div className="absolute bottom-1/3 left-0 w-[400px] h-[400px] bg-cyber-purple/[0.03] blur-[100px] rounded-full" />
+      </div>
 
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="grid gap-4 md:grid-cols-3">
-          {phases.map((phase) => (
-            <div key={phase.name} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
-              <div className="text-xs uppercase tracking-[0.24em] text-stone-500">{phase.name}</div>
-              <div className="mt-3 font-[family:var(--font-display)] text-2xl">
-                {phase.name === "Bugün" ? "Platformlaşma" : phase.name === "Sonraki Adım" ? "Autofix" : "Cloud Scale"}
-              </div>
-              <p className="mt-4 text-sm leading-7 text-stone-400">{phase.text}</p>
+      {/* ── Nav ────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-cyber-black/70 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-9 h-9">
+              <div className="absolute inset-0 rounded-xl bg-cyber-green/20 border border-cyber-green/40 group-hover:bg-cyber-green/30 transition" />
+              <Shield className="absolute inset-0 m-auto w-5 h-5 text-cyber-green" />
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="grid gap-6 lg:grid-cols-4">
-          {differentiators.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className="rounded-[1.75rem] border border-white/10 bg-black/30 p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-300/10 text-emerald-100">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="mt-5 font-[family:var(--font-display)] text-2xl">{item.title}</div>
-                <p className="mt-3 text-sm leading-7 text-stone-400">{item.body}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="flex items-end justify-between gap-8">
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-stone-500">What we do now</div>
-            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Sunduğumuz ve genişlettiğimiz hizmetler</h2>
-          </div>
-          <Link href="/services" className="hidden text-sm text-amber-200 md:inline-flex">
-            Tüm katalog <ArrowRight className="ml-2 h-4 w-4" />
+            <div>
+              <span className="text-base font-black tracking-widest text-white">KEYMAKER</span>
+              <div className="text-[9px] tracking-[0.3em] text-zinc-600 uppercase">Cyber Security</div>
+            </div>
           </Link>
+
+          <div className="hidden md:flex items-center gap-8 text-sm text-zinc-400">
+            <a href="#products" className="hover:text-white transition-colors">{i.nav.products}</a>
+            <a href="#download" className="hover:text-white transition-colors">{i.nav.download}</a>
+            <a href="#enterprise" className="hover:text-white transition-colors">{i.nav.enterprise}</a>
+            <a href="#compare" className="hover:text-white transition-colors">Karşılaştır</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setLocale(locale === "tr" ? "en" : "tr")}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 rounded-lg text-xs text-zinc-500 hover:text-zinc-300 hover:border-white/20 transition"
+            >
+              <Globe2 className="w-3.5 h-3.5" />
+              {locale === "tr" ? "EN" : "TR"}
+            </button>
+            <Link
+              href="/login"
+              className="hidden sm:inline-flex px-4 py-1.5 text-sm font-medium text-zinc-300 hover:text-white transition"
+            >
+              Giriş Yap
+            </Link>
+            <a
+              href="#enterprise"
+              className="px-4 py-1.5 rounded-lg bg-cyber-green text-black text-sm font-bold hover:bg-cyber-green/90 transition shadow-[0_0_20px_rgba(0,255,157,0.25)]"
+            >
+              Demo Al
+            </a>
+          </div>
         </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {highlightedServices.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
-                <div className="flex items-center gap-3">
-                  <Icon className="h-5 w-5 text-amber-200" />
-                  <div className="font-semibold text-stone-100">{item.title}</div>
+      </nav>
+
+      {/* ── Hero ────────────────────────────────────────────────────── */}
+      <section className="relative z-10 pt-24 pb-20 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full border border-cyber-green/30 bg-cyber-green/5 text-cyber-green text-xs font-mono tracking-widest"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            {i.hero.badge}
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6"
+          >
+            {i.hero.title1}
+            <br />
+            <span className="text-cyber-green [text-shadow:0_0_40px_rgba(0,255,157,0.4)]">
+              {i.hero.title2}
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+          >
+            {i.hero.subtitle}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-4 mb-16"
+          >
+            <a
+              href="#download"
+              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-cyber-green text-black font-bold text-base hover:bg-cyber-green/90 transition shadow-[0_0_40px_rgba(0,255,157,0.3)] hover:shadow-[0_0_60px_rgba(0,255,157,0.4)]"
+            >
+              <Download className="w-5 h-5" />
+              {i.hero.cta_download}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+            <a
+              href="#enterprise"
+              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-xl border border-white/15 text-white font-bold text-base hover:bg-white/5 hover:border-white/25 transition"
+            >
+              <Building2 className="w-5 h-5" />
+              {i.hero.cta_enterprise}
+            </a>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
+          >
+            {i.stats.map((s) => (
+              <motion.div key={s.label} variants={fadeUp} className="glass-panel rounded-2xl p-5 border border-white/[0.07] hover:border-cyber-green/20 transition">
+                <div className="text-3xl font-black text-cyber-green mb-1">{s.value}</div>
+                <div className="text-xs text-zinc-500 leading-tight">{s.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Tech Stack Bar ──────────────────────────────────────────── */}
+      <section className="relative z-10 py-12 border-y border-white/[0.06] bg-white/[0.015]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+            {TECH_STACK.map(({ icon: Icon, label, desc }) => (
+              <div key={label} className="flex flex-col items-center gap-2 text-center group">
+                <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/[0.04] flex items-center justify-center group-hover:border-cyber-green/30 group-hover:bg-cyber-green/5 transition">
+                  <Icon className="w-5 h-5 text-zinc-500 group-hover:text-cyber-green transition" />
                 </div>
-                <p className="mt-4 text-sm leading-7 text-stone-400">{item.body}</p>
+                <div className="text-[11px] font-semibold text-zinc-300 leading-tight">{label}</div>
+                <div className="text-[10px] text-zinc-600">{desc}</div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="rounded-[2rem] border border-white/10 bg-[#0b1512] p-8">
-            <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Next wave</div>
-            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Geliştirilecek modüller ve yenilikçi fikirler</h2>
-            <div className="mt-8 space-y-5">
-              {roadmapModules.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-5 w-5 text-emerald-200" />
-                      <div className="font-semibold text-stone-100">{item.title}</div>
+      {/* ── Products ────────────────────────────────────────────────── */}
+      <section id="products" className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-center mb-16"
+          >
+            <motion.div variants={fadeUp} className="text-xs font-mono text-cyber-green tracking-widest mb-3">ÜRÜNLER</motion.div>
+            <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black">{i.products.title}</motion.h2>
+          </motion.div>
+
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid md:grid-cols-2 gap-6"
+          >
+            {/* Defender */}
+            <motion.div variants={fadeUp} className="relative group rounded-2xl border border-cyber-green/20 bg-gradient-to-b from-cyber-green/[0.05] to-transparent p-8 hover:border-cyber-green/40 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyber-green/60 to-transparent" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-cyber-green/[0.04] blur-3xl rounded-full" />
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl border border-cyber-green/30 bg-cyber-green/10 flex items-center justify-center mb-6">
+                  <ShieldCheck className="w-7 h-7 text-cyber-green" />
+                </div>
+                <h3 className="text-2xl font-black mb-2">{i.products.defender.name}</h3>
+                <p className="text-zinc-400 mb-6 text-sm">{i.products.defender.desc}</p>
+                <div className="space-y-2.5 mb-8">
+                  {i.products.defender.features.map((f) => (
+                    <div key={f} className="flex items-start gap-3">
+                      <Check className="w-4 h-4 text-cyber-green mt-0.5 shrink-0" />
+                      <span className="text-sm text-zinc-300">{f}</span>
                     </div>
-                    <p className="mt-3 text-sm leading-7 text-stone-400">{item.body}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                  ))}
+                </div>
+                <a href="#download" className="inline-flex items-center gap-2 text-sm font-bold text-cyber-green hover:underline group">
+                  İndir <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </motion.div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-black/30 p-8">
-            <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Multi-agent fabric</div>
-            <h2 className="mt-4 font-[family:var(--font-display)] text-4xl">Entegre çalışacak AI agent katmanı</h2>
-            <div className="mt-8 space-y-5">
-              {aiAgents.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-5 w-5 text-amber-200" />
-                      <div className="font-semibold text-stone-100">{item.title}</div>
+            {/* Sovereign */}
+            <motion.div variants={fadeUp} className="relative group rounded-2xl border border-amber-500/20 bg-gradient-to-b from-amber-500/[0.05] to-transparent p-8 hover:border-amber-500/40 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-amber-500/[0.04] blur-3xl rounded-full" />
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex items-center justify-center mb-6">
+                  <Eye className="w-7 h-7 text-amber-400" />
+                </div>
+                <h3 className="text-2xl font-black mb-2">{i.products.sovereign.name}</h3>
+                <p className="text-zinc-400 mb-6 text-sm">{i.products.sovereign.desc}</p>
+                <div className="space-y-2.5 mb-8">
+                  {i.products.sovereign.features.map((f) => (
+                    <div key={f} className="flex items-start gap-3">
+                      <Check className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                      <span className="text-sm text-zinc-300">{f}</span>
                     </div>
-                    <p className="mt-3 text-sm leading-7 text-stone-400">{item.body}</p>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+                <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-bold text-amber-400 hover:underline group">
+                  {i.enterprise.contact} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Download ────────────────────────────────────────────────── */}
+      <section id="download" className="relative z-10 py-24 px-6 bg-[radial-gradient(ellipse_at_center,rgba(0,255,157,0.04),transparent_70%)]">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="text-xs font-mono text-cyber-green tracking-widest mb-3">İNDİR</div>
+          <h2 className="text-4xl md:text-5xl font-black mb-4">{i.download.title}</h2>
+          <p className="text-zinc-400 mb-12">{i.download.subtitle}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            {[
+              { icon: Monitor, label: i.download.windows },
+              { icon: Laptop, label: i.download.macos },
+              { icon: Terminal, label: i.download.linux },
+            ].map(({ icon: Icon, label }) => (
+              <a
+                key={label}
+                href="#"
+                className="group relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 flex flex-col items-center gap-3 hover:border-cyber-green/40 hover:bg-cyber-green/[0.04] transition-all duration-300"
+              >
+                <Icon className="w-10 h-10 text-zinc-500 group-hover:text-cyber-green transition-colors" />
+                <span className="font-bold text-zinc-300 group-hover:text-white transition-colors">{label}</span>
+                <Download className="w-4 h-4 text-zinc-700 group-hover:text-cyber-green transition-colors" />
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyber-green/0 to-transparent group-hover:via-cyber-green/50 transition-all duration-300" />
+              </a>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto mb-8">
+            {[i.download.android, i.download.ios].map((label) => (
+              <div key={label} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
+                <Smartphone className="w-7 h-7 text-zinc-600" />
+                <span className="text-xs text-zinc-600">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-zinc-700 font-mono">{i.download.note}</p>
+        </div>
+      </section>
+
+      {/* ── Technology ──────────────────────────────────────────────── */}
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="text-xs font-mono text-cyber-green tracking-widest mb-3">TEKNOLOJİ</div>
+            <h2 className="text-4xl md:text-5xl font-black">{i.tech.title}</h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {i.tech.items.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 hover:border-cyber-green/25 hover:bg-cyber-green/[0.02] transition-all duration-300 overflow-hidden"
+              >
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-cyber-green/[0.04] rounded-full blur-2xl group-hover:bg-cyber-green/[0.08] transition" />
+                <h3 className="text-lg font-bold mb-2 text-white">{item.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Comparison ──────────────────────────────────────────────── */}
+      <section id="compare" className="relative z-10 py-24 px-6 bg-white/[0.01]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="text-xs font-mono text-cyber-green tracking-widest mb-3">KARŞILAŞTIRMA</div>
+            <h2 className="text-4xl md:text-5xl font-black">{i.comparison.title}</h2>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.08] bg-white/[0.03]">
+                  <th className="text-left py-4 px-6 text-zinc-500 font-medium">{i.comparison.headers[0]}</th>
+                  <th className="py-4 px-4 text-center">
+                    <span className="inline-flex items-center gap-1.5 text-cyber-green font-bold">
+                      <Shield className="w-4 h-4" /> {i.comparison.headers[1]}
+                    </span>
+                  </th>
+                  <th className="py-4 px-4 text-center text-zinc-500 font-medium">{i.comparison.headers[2]}</th>
+                  <th className="py-4 px-4 text-center text-zinc-500 font-medium">{i.comparison.headers[3]}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON.map((row, idx) => (
+                  <tr key={row.feature.en} className={`border-b border-white/[0.05] hover:bg-white/[0.02] transition-colors ${idx % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
+                    <td className="py-3.5 px-6 text-zinc-300 font-medium">{row.feature[locale]}</td>
+                    <td className="py-3.5 px-4"><Cell val={row.keymaker} /></td>
+                    <td className="py-3.5 px-4"><Cell val={row.paloalto} /></td>
+                    <td className="py-3.5 px-4"><Cell val={row.crowdstrike} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Enterprise ──────────────────────────────────────────────── */}
+      <section id="enterprise" className="relative z-10 py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative rounded-3xl border border-cyber-green/20 bg-gradient-to-b from-cyber-green/[0.06] to-transparent p-12 text-center overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyber-green/50 to-transparent" />
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-64 bg-cyber-green/[0.06] blur-3xl rounded-full" />
+
+            <div className="relative">
+              <div className="text-xs font-mono text-cyber-green tracking-widest mb-3">KURUMSAL</div>
+              <h2 className="text-4xl md:text-5xl font-black mb-4">{i.enterprise.title}</h2>
+              <p className="text-zinc-400 mb-10 max-w-xl mx-auto">{i.enterprise.subtitle}</p>
+
+              <div className="flex flex-wrap justify-center gap-2.5 mb-10">
+                {i.enterprise.sectors.map((s) => (
+                  <span key={s} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] text-sm text-zinc-300">
+                    <ChevronRight className="w-3 h-3 text-cyber-green" />
+                    {s}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link href="/beta" className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-cyber-green text-black font-bold text-base hover:bg-cyber-green/90 transition shadow-[0_0_40px_rgba(0,255,157,0.3)]">
+                  {i.enterprise.cta} <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link href="/contact" className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl border border-white/20 text-white font-bold text-base hover:bg-white/5 transition">
+                  {i.enterprise.contact}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-stone-500">Commercial</div>
-            <h2 className="mt-3 font-[family:var(--font-display)] text-4xl md:text-5xl">Fiyatlandırma ve demo görüşmesi</h2>
-            <p className="mt-6 text-base leading-8 text-stone-400">
-              Bunu daha da geliştireceğiz. Rakipleri sürekli analiz edip özellik setini genişleteceğiz; bu yüzden fiyatlama sabit paket yerine
-              ihtiyaç ve entegrasyon yoğunluğuna göre yapılandırılıyor.
-            </p>
-            <div className="mt-8 space-y-3 text-sm text-stone-300">
-              <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Demo, mimari keşif ve uygunluk değerlendirmesi
-              </div>
-              <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Yönetilen hizmet veya ürün lisansı seçenekleri
-              </div>
-              <div className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-200" /> Kurum içi, private cloud veya sovereign deployment senaryoları
-              </div>
-            </div>
+      {/* ── Footer ──────────────────────────────────────────────────── */}
+      <footer className="relative z-10 border-t border-white/[0.06] py-10 px-6">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-cyber-green" />
+            <span className="font-black tracking-widest text-sm">KEYMAKER</span>
+            <span className="text-zinc-600 text-sm">{i.footer.copyright}</span>
           </div>
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
-            <div className="grid gap-5 md:grid-cols-2">
-              <label className="text-sm text-stone-300">
-                Ad Soyad
-                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="İsim Soyisim" />
-              </label>
-              <label className="text-sm text-stone-300">
-                Şirket
-                <input className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Şirket adı" />
-              </label>
-              <label className="text-sm text-stone-300">
-                İş e-postası
-                <input value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="security@company.com" />
-              </label>
-              <label className="text-sm text-stone-300">
-                İlgilendiğiniz alan
-                <select className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 outline-none">
-                  <option>Autonomous AppSec</option>
-                  <option>Cloud Security</option>
-                  <option>Managed Program</option>
-                  <option>Sovereign Deployment</option>
-                </select>
-              </label>
-              <label className="text-sm text-stone-300 md:col-span-2">
-                Mesaj
-                <textarea className="mt-2 min-h-32 w-full rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-3 outline-none" placeholder="Hangi ekipler, hangi altyapı ve hangi öncelikler için görüşmek istediğinizi yazın." />
-              </label>
-            </div>
-            <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-              <Link href={email ? `/demo?email=${encodeURIComponent(email)}` : "/demo"} className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-200 px-6 py-3 text-sm font-semibold text-stone-950">
-                Görüşme Başlat <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-stone-100">
-                Fiyatlandırma Detayı
-              </Link>
-            </div>
+          <div className="flex items-center gap-6 text-sm text-zinc-600">
+            <Link href="/privacy" className="hover:text-zinc-400 transition">Privacy</Link>
+            <Link href="/terms" className="hover:text-zinc-400 transition">Terms</Link>
+            <Link href="/cookies" className="hover:text-zinc-400 transition">Cookies</Link>
+            <span className="text-cyber-green font-mono">{i.footer.location}</span>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
-            <TowerControl className="h-6 w-6 text-amber-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Teknik mesaj</div>
-            <p className="mt-3 text-sm leading-7 text-stone-400">
-              Event-driven servisler, agent orchestration, RAG hafıza, patch önerisi, güvenlik test otomasyonu ve kanıt zinciri.
-            </p>
-          </div>
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
-            <Globe2 className="h-6 w-6 text-emerald-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Yarı teknik mesaj</div>
-            <p className="mt-3 text-sm leading-7 text-stone-400">
-              Ekiplerinize sadece risk listesi değil, öncelik, iyileştirme planı ve güvenli büyüme için işletilebilir yol haritası sunuyoruz.
-            </p>
-          </div>
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6">
-            <CheckCircle2 className="h-6 w-6 text-amber-200" />
-            <div className="mt-4 font-[family:var(--font-display)] text-2xl">Sürekli gelişim vaadi</div>
-            <p className="mt-3 text-sm leading-7 text-stone-400">
-              Şu anda başlamadıysak ilgili altyapıyı başlatırız; başladıysak ürünleştirip kurumsal ölçekte nihayete erdiririz.
-            </p>
-          </div>
-        </div>
-      </section>
-    </MarketingShell>
+      </footer>
+    </div>
   );
 }
