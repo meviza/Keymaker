@@ -1,4 +1,6 @@
-import { Shield, FileText, Scale, AlertTriangle, CheckCircle2 } from "lucide-react";
+"use client";
+import { useTheme } from "@/components/ThemeProvider";
+import { Sun, Moon, Shield, FileText, Scale, AlertTriangle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 const sections = [
@@ -25,15 +27,17 @@ const sections = [
 ];
 
 export default function TermsPage() {
+  const { theme, toggle } = useTheme();
+
   return (
-    <div className="w-full min-h-screen bg-cyber-black text-white overflow-x-hidden">
+    <div className="w-full min-h-screen bg-white dark:bg-cyber-black text-zinc-900 dark:text-white overflow-x-hidden">
       {/* Ambient */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[min(700px,100vw)] h-96 bg-cyber-green/[0.04] blur-[100px] rounded-full" />
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-cyber-black/70 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-zinc-200 dark:border-white/[0.06] bg-white/80 dark:bg-cyber-black/70 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative w-9 h-9 shrink-0">
@@ -45,9 +49,15 @@ export default function TermsPage() {
               <div className="text-[8px] tracking-[0.25em] text-zinc-600 uppercase">Cyber Security</div>
             </div>
           </Link>
-          <div className="flex items-center gap-4 text-sm text-zinc-500">
-            <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
-            <Link href="/cookies" className="hover:text-white transition">Cookies</Link>
+          <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-500">
+            <button
+              onClick={toggle}
+              className="w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <Link href="/privacy" className="hover:text-zinc-900 dark:hover:text-white transition">Privacy</Link>
+            <Link href="/cookies" className="hover:text-zinc-900 dark:hover:text-white transition">Cookies</Link>
             <Link href="/contact" className="px-3 py-1.5 rounded-lg bg-cyber-green text-black text-xs font-bold hover:bg-cyber-green/90 transition">
               İletişim
             </Link>
@@ -60,10 +70,10 @@ export default function TermsPage() {
         <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-cyber-green/30 bg-cyber-green/5 text-cyber-green text-xs font-mono tracking-widest">
           <Scale className="w-3.5 h-3.5" /> KULLANIM KOŞULLARI
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4">
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 text-zinc-900 dark:text-white">
           Sorumlu ve <span className="text-cyber-green">etik kullanım.</span>
         </h1>
-        <p className="text-zinc-400 max-w-xl mx-auto text-sm sm:text-base">
+        <p className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto text-sm sm:text-base">
           Bu sayfa, pazarlama sitesi ve demo başvuru akışlarına yönelik özet koşulları içerir. Üretim ortamında avukat incelemesi gereklidir.
         </p>
       </section>
@@ -72,29 +82,29 @@ export default function TermsPage() {
       <section className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-32">
         <div className="max-w-4xl mx-auto grid sm:grid-cols-2 gap-4">
           {sections.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 hover:border-cyber-green/20 transition group">
+            <div key={title} className="rounded-2xl border border-zinc-200 dark:border-white/[0.07] bg-zinc-50 dark:bg-white/[0.02] p-6 hover:border-cyber-green/30 transition group">
               <div className="w-10 h-10 rounded-xl border border-cyber-green/20 bg-cyber-green/5 flex items-center justify-center mb-4 group-hover:border-cyber-green/40 transition">
                 <Icon className="w-5 h-5 text-cyber-green" />
               </div>
-              <h3 className="font-bold text-white mb-2">{title}</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">{body}</p>
+              <h3 className="font-bold text-zinc-900 dark:text-white mb-2">{title}</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/[0.06] py-8 px-4 sm:px-6">
+      <footer className="relative z-10 border-t border-zinc-200 dark:border-white/[0.06] py-8 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-cyber-green" />
-            <span className="font-black tracking-widest text-xs">KEYMAKER</span>
-            <span className="text-zinc-600 text-xs">© 2026 Keymaker Siber Güvenlik.</span>
+            <span className="font-black tracking-widest text-xs text-zinc-700 dark:text-zinc-600">KEYMAKER</span>
+            <span className="text-zinc-500 dark:text-zinc-600 text-xs">© 2026 Keymaker Siber Güvenlik.</span>
           </div>
-          <div className="flex items-center gap-4 text-xs text-zinc-600">
-            <Link href="/privacy" className="hover:text-zinc-400 transition">Privacy</Link>
-            <Link href="/cookies" className="hover:text-zinc-400 transition">Cookies</Link>
-            <Link href="/contact" className="hover:text-zinc-400 transition">İletişim</Link>
+          <div className="flex items-center gap-4 text-xs text-zinc-400 dark:text-zinc-600">
+            <Link href="/privacy" className="hover:text-zinc-700 dark:hover:text-zinc-400 transition">Privacy</Link>
+            <Link href="/cookies" className="hover:text-zinc-700 dark:hover:text-zinc-400 transition">Cookies</Link>
+            <Link href="/contact" className="hover:text-zinc-700 dark:hover:text-zinc-400 transition">İletişim</Link>
           </div>
         </div>
       </footer>

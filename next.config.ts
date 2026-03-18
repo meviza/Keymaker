@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   output: "export",
   basePath: "/Keymaker",
   assetPrefix: "/Keymaker/",
-  images: {
-    unoptimized: true,
-  },
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
