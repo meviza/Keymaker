@@ -5,7 +5,6 @@ import { Shield, Activity, TrendingUp, AlertCircle, RefreshCw } from "lucide-rea
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"

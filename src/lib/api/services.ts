@@ -17,6 +17,204 @@ export interface SystemStatus {
   agents: { active: number; total: number }
 }
 
+export interface EnvironmentReadiness {
+  environment: Array<{ name: string; configured: boolean }>
+  ready_count: number
+  total_count: number
+}
+
+export interface IdentityProviderRecord {
+  id: string
+  tenant_id: string
+  provider_type: string
+  issuer: string
+  client_id: string
+  audience: string
+  discovery_url?: string
+  saml_metadata_url?: string
+  jwks_uri?: string
+  claim_mapping?: Record<string, string>
+}
+
+export interface RepositoryIntegrationRecord {
+  id: string
+  tenant_id: string
+  provider: string
+  repo_slug: string
+  default_branch: string
+  ci_provider: string
+  auth_mode?: string
+  secret_ref?: string
+  webhook_secret_ref?: string
+  api_base_url?: string
+  project_id?: string
+}
+
+export interface FederatedIdentityRecord {
+  tenant_id: string
+  provider_id: string
+  subject: string
+  email?: string
+  role: string
+  claims: Record<string, string>
+}
+
+export interface IntegrationReadiness {
+  repository_id: string
+  tenant_id: string
+  provider: string
+  repo_slug: string
+  api_base_url?: string
+  auth_mode: string
+  secret_ref?: string
+  secret_available: boolean
+  webhook_secret_ref?: string
+  webhook_secret_available: boolean
+  delivery_ready: boolean
+}
+
+export interface AuthorizedTargetRecord {
+  id: string
+  tenant_id: string
+  repository_id?: string
+  target_id: string
+  target_type: string
+  authorization_mode: string
+  evidence_reference: string
+  allowed_operations: string[]
+  constraints: string[]
+}
+
+export interface PatchJobRecord {
+  id: string
+  plan_id: string
+  status: string
+  rollback_reference?: string
+  pr_artifact?: {
+    branch_name: string
+    title: string
+    body: string
+    labels: string[]
+  }
+}
+
+export interface PullRequestHandoffRecord {
+  id: string
+  patch_job_id: string
+  repository_id: string
+  branch_name: string
+  title: string
+  body: string
+  release_gate_status: string
+  delivery_status?: string
+  remote_id?: string
+  remote_url?: string
+}
+
+export interface DefensivePackRecord {
+  case_type: string
+  model_strategy: string
+  retrieval: {
+    query: string
+    filters: Record<string, string>
+    memories: Array<{ id: string; title: string; memory_type: string; score: string }>
+  }
+  policy: {
+    persona: string
+    guardrails: string[]
+    required_checks: string[]
+    approval_required: boolean
+  }
+  evaluation: {
+    objectives: string[]
+    scorecards: Array<{ name: string; target: string }>
+    stop_conditions: string[]
+  }
+  replay: {
+    timeline: Array<{ stage: string; status: string }>
+    artifacts: string[]
+    writeback_targets: string[]
+  }
+  authorized_target: {
+    target_id: string
+    target_type: string
+    authorization_mode: string
+    evidence_reference: string
+    allowed_operations: string[]
+    constraints: string[]
+  }
+}
+
+export interface DefensiveReplayRecord {
+  id: string
+  tenant_id?: string
+  repository_id?: string
+  case_type: string
+  objective?: string
+  status: string
+  total_score: number
+  candidate_output: string
+}
+
+export interface DefensiveRuntimeRecord {
+  runtime_mode: string
+  instruction_bundle: {
+    system_contract: string[]
+    retrieval_query: string
+    retrieved_memories: Array<{ id: string; title: string; memory_type: string; score: string }>
+    guardrails: string[]
+    required_checks: string[]
+    artifacts: string[]
+  }
+  evaluation_targets: Array<{ name: string; target: string }>
+  stop_conditions: string[]
+  writeback_targets: string[]
+  pack: DefensivePackRecord
+  blocked?: boolean
+  halt_reasons?: string[]
+  authorization_status?: string
+  repository_context?: Record<string, unknown>
+}
+
+export interface DefensiveEvaluationRecord {
+  total_score: number
+  passed: boolean
+  blocked?: boolean
+  halt_reasons?: string[]
+  dimension_scores: {
+    traceability: number
+    rollback_safety: number
+    governance: number
+  }
+  replay_record: {
+    id?: string
+    status: string
+    reason: string
+    candidate_excerpt: string
+  }
+  replay_memory?: {
+    id: string
+    memory_type: string
+  } | null
+}
+
+export interface DefensiveDraftRecord {
+  candidate_output: string
+  source: string
+  blocked?: boolean
+  halt_reasons?: string[]
+}
+
+export interface CvePredictionResult {
+  cve_id?: string
+  prediction: {
+    probability: number
+    reasoning: string
+    threat_level: string
+  }
+  status?: string
+}
+
 export type ScanProfile =
   | 'recon'
   | 'vulnerability'
@@ -326,22 +524,214 @@ export const apiService = {
 
   // Threat Stats (placeholder for future backend endpoint)
   async getThreatStats(): Promise<Array<{ label: string; value: number; change?: number; severity?: string }>> {
-    // TODO: Wire to real backend when endpoint exists
-    return [
-      { label: 'Critical Threats', value: 7, change: -12, severity: 'critical' },
-      { label: 'Active Exploits', value: 23, change: 5, severity: 'high' },
-      { label: 'Scans Running', value: 142, change: 8, severity: 'medium' },
-      { label: 'Vulnerabilities', value: 1847, change: -3, severity: 'low' }
-    ]
+    try {
+      const [environment, reports, system] = await Promise.all([
+        apiService.getEnvironmentReadiness(),
+        apiService.listReports(),
+        apiService.getSystemStatus(),
+      ])
+      return [
+        { label: 'Secrets Ready', value: environment.ready_count, change: environment.ready_count - environment.total_count, severity: environment.ready_count === environment.total_count ? 'low' : 'critical' },
+        { label: 'Reports Generated', value: reports.length, change: reports.length, severity: 'low' },
+        { label: 'Active Agents', value: system.agents.active, change: system.agents.total - system.agents.active, severity: 'medium' },
+        { label: 'Env Coverage', value: environment.total_count, change: 0, severity: 'low' }
+      ]
+    } catch {
+      return [
+        { label: 'Critical Threats', value: 7, change: -12, severity: 'critical' },
+        { label: 'Active Exploits', value: 23, change: 5, severity: 'high' },
+        { label: 'Scans Running', value: 142, change: 8, severity: 'medium' },
+        { label: 'Vulnerabilities', value: 1847, change: -3, severity: 'low' }
+      ]
+    }
+  },
+
+  async getEnvironmentReadiness(): Promise<EnvironmentReadiness> {
+    return fetchClient.getJson<EnvironmentReadiness>(`${API_BASE}/delivery-ops/environment/readiness`)
+  },
+
+  async registerIdentityProvider(payload: {
+    tenant_id: string
+    provider_type: string
+    issuer: string
+    client_id: string
+    audience: string
+    discovery_url?: string
+    saml_metadata_url?: string
+    jwks_uri?: string
+    claim_mapping?: Record<string, string>
+  }): Promise<IdentityProviderRecord> {
+    return fetchClient.postJson<IdentityProviderRecord>(`${API_BASE}/identity-access/providers`, payload)
+  },
+
+  async listIdentityProviders(tenantId?: string): Promise<IdentityProviderRecord[]> {
+    const suffix = tenantId ? `?tenant_id=${encodeURIComponent(tenantId)}` : ''
+    const response = await fetchClient.getJson<{ providers: IdentityProviderRecord[] }>(`${API_BASE}/identity-access/providers${suffix}`)
+    return response.providers
+  },
+
+  async getProviderReadiness(providerId: string): Promise<Record<string, unknown>> {
+    return fetchClient.getJson<Record<string, unknown>>(`${API_BASE}/identity-access/providers/${providerId}/readiness`)
+  },
+
+  async verifyFederatedToken(provider_id: string, token: string): Promise<FederatedIdentityRecord> {
+    return fetchClient.postJson<FederatedIdentityRecord>(`${API_BASE}/identity-access/verify-token`, { provider_id, token })
+  },
+
+  async registerRepository(payload: {
+    tenant_id: string
+    provider: string
+    repo_slug: string
+    default_branch: string
+    ci_provider: string
+    auth_mode?: string
+    secret_ref?: string
+    webhook_secret_ref?: string
+    api_base_url?: string
+    project_id?: string
+  }): Promise<RepositoryIntegrationRecord> {
+    return fetchClient.postJson<RepositoryIntegrationRecord>(`${API_BASE}/delivery-ops/repositories`, payload)
+  },
+
+  async listRepositories(tenantId: string): Promise<RepositoryIntegrationRecord[]> {
+    const response = await fetchClient.getJson<{ repositories: RepositoryIntegrationRecord[] }>(`${API_BASE}/delivery-ops/repositories/${tenantId}`)
+    return response.repositories
+  },
+
+  async getRepositoryReadiness(repositoryId: string): Promise<IntegrationReadiness> {
+    return fetchClient.getJson<IntegrationReadiness>(`${API_BASE}/delivery-ops/repositories/${repositoryId}/readiness`)
+  },
+
+  async getOperatingModel(tenantId: string): Promise<Record<string, unknown>> {
+    return fetchClient.getJson<Record<string, unknown>>(`${API_BASE}/commercial-ops/operating-model/${tenantId}`)
+  },
+
+  async upsertAuthorizedTarget(payload: {
+    tenant_id: string
+    target_id: string
+    target_type: string
+    authorization_mode: string
+    evidence_reference: string
+    allowed_operations: string[]
+    constraints: string[]
+    repository_id?: string
+    target_record_id?: string
+  }): Promise<AuthorizedTargetRecord> {
+    return fetchClient.postJson<AuthorizedTargetRecord>(`${API_BASE}/platform-ops/authorized-targets`, payload)
+  },
+
+  async listAuthorizedTargets(tenantId?: string): Promise<AuthorizedTargetRecord[]> {
+    const suffix = tenantId ? `?tenant_id=${encodeURIComponent(tenantId)}` : ''
+    const response = await fetchClient.getJson<{ authorized_targets: AuthorizedTargetRecord[] }>(`${API_BASE}/platform-ops/authorized-targets${suffix}`)
+    return response.authorized_targets
+  },
+
+  async getExecutiveSnapshot(tenantId: string): Promise<Record<string, unknown>> {
+    return fetchClient.getJson<Record<string, unknown>>(`${API_BASE}/executive-ops/snapshot/${tenantId}`)
+  },
+
+  async listPatchJobs(planId?: string): Promise<PatchJobRecord[]> {
+    const suffix = planId ? `?plan_id=${encodeURIComponent(planId)}` : ''
+    const response = await fetchClient.getJson<{ patch_jobs: PatchJobRecord[] }>(`${API_BASE}/remediation/patch-jobs${suffix}`)
+    return response.patch_jobs
+  },
+
+  async getPatchJob(patchJobId: string): Promise<PatchJobRecord> {
+    const response = await fetchClient.getJson<{ patch_job: PatchJobRecord }>(`${API_BASE}/remediation/patch-jobs/${patchJobId}`)
+    return response.patch_job
+  },
+
+  async createPrHandoff(payload: { tenant_id: string; patch_job: PatchJobRecord; repository_id: string }): Promise<PullRequestHandoffRecord> {
+    return fetchClient.postJson<PullRequestHandoffRecord>(`${API_BASE}/delivery-ops/pr-handoff`, payload)
+  },
+
+  async publishPr(handoffId: string): Promise<Record<string, unknown>> {
+    return fetchClient.postJson<Record<string, unknown>>(`${API_BASE}/delivery-ops/pr-handoff/${handoffId}/publish`, {})
+  },
+
+  async syncPr(handoffId: string): Promise<Record<string, unknown>> {
+    return fetchClient.postJson<Record<string, unknown>>(`${API_BASE}/delivery-ops/pr-handoff/${handoffId}/sync`, {})
+  },
+
+  async listPrHandoffs(repositoryId?: string, patchJobId?: string): Promise<PullRequestHandoffRecord[]> {
+    const query = new URLSearchParams()
+    if (repositoryId) query.set('repository_id', repositoryId)
+    if (patchJobId) query.set('patch_job_id', patchJobId)
+    const suffix = query.toString() ? `?${query.toString()}` : ''
+    const response = await fetchClient.getJson<{ handoffs: PullRequestHandoffRecord[] }>(`${API_BASE}/delivery-ops/pr-handoff${suffix}`)
+    return response.handoffs
+  },
+
+  async getDefensivePack(payload: {
+    case_type?: string
+    persona?: string
+    objective?: string
+    tenant_id?: string
+    repository_id?: string
+    handoff_id?: string
+    top_k?: number
+    findings?: Array<Record<string, unknown>>
+    target_profile?: Record<string, unknown>
+  }): Promise<DefensivePackRecord> {
+    return fetchClient.postJson<DefensivePackRecord>(`${API_BASE}/defensive-ai/pack`, payload)
+  },
+
+  async listDefensiveReplays(params?: {
+    tenant_id?: string
+    repository_id?: string
+    status?: string
+  }): Promise<DefensiveReplayRecord[]> {
+    const query = new URLSearchParams()
+    if (params?.tenant_id) query.set('tenant_id', params.tenant_id)
+    if (params?.repository_id) query.set('repository_id', params.repository_id)
+    if (params?.status) query.set('status', params.status)
+    const suffix = query.toString() ? `?${query.toString()}` : ''
+    const response = await fetchClient.getJson<{ replays: DefensiveReplayRecord[] }>(`${API_BASE}/defensive-ai-runtime/replays${suffix}`)
+    return response.replays
+  },
+
+  async prepareDefensiveRuntime(payload: {
+    case_type?: string
+    persona?: string
+    objective?: string
+    tenant_id?: string
+    repository_id?: string
+    handoff_id?: string
+    top_k?: number
+    findings?: Array<Record<string, unknown>>
+  }): Promise<DefensiveRuntimeRecord> {
+    return fetchClient.postJson<DefensiveRuntimeRecord>(`${API_BASE}/defensive-ai-runtime/prepare`, payload)
+  },
+
+  async evaluateAndStoreDefensiveCandidate(payload: {
+    candidate_output: string
+    findings?: Array<Record<string, unknown>>
+    pack?: Record<string, unknown>
+    tenant_id?: string
+    repository_id?: string
+    case_type?: string
+    objective?: string
+  }): Promise<DefensiveEvaluationRecord> {
+    return fetchClient.postJson<DefensiveEvaluationRecord>(`${API_BASE}/defensive-ai-runtime/evaluate-and-store`, payload)
+  },
+
+  async generateDefensiveDraft(payload: {
+    pack: Record<string, unknown>
+    findings?: Array<Record<string, unknown>>
+    objective?: string
+    repository_context?: Record<string, unknown>
+  }): Promise<DefensiveDraftRecord> {
+    return fetchClient.postJson<DefensiveDraftRecord>(`${API_BASE}/defensive-ai-runtime/draft`, payload)
   },
 
   // CVE Prediction
-  async predictCVE(cveId: string, cvss: number = 0): Promise<any> {
+  async predictCVE(cveId: string, cvss: number = 0): Promise<CvePredictionResult> {
     try {
-      return await fetchClient.getJson(`${API_BASE}/cti/predict/${cveId}?cvss=${cvss}`)
+      return await fetchClient.getJson<CvePredictionResult>(`${API_BASE}/cti/predict/${cveId}?cvss=${cvss}`)
     } catch {
       return {
         status: 'fallback',
+        cve_id: cveId,
         prediction: {
           probability: 0.3,
           reasoning: 'System offline, using heuristic fallback.',

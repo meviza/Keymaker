@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ShieldAlert, Terminal, FileText, Scale, Database, LayoutDashboard, Activity, Settings, Key, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ShieldAlert, Terminal, FileText, Scale, Database, LayoutDashboard, Activity, Settings, Key, Zap, LogOut, Shield } from "lucide-react";
 import clsx from "clsx";
+import { getSessionUser } from "@/lib/auth/session";
+import { logout } from "@/lib/auth/authService";
+import { isPublicPath } from "@/lib/auth/access";
 
 const navItems = [
   { name: "Anahtarcı", href: "/command", icon: LayoutDashboard },
@@ -14,16 +17,23 @@ const navItems = [
   { name: "Reports", href: "/reports", icon: FileText },
   { name: "Ethics Sentinel", href: "/ethics", icon: Scale },
   { name: "CTI Database", href: "/cti", icon: Database },
+  { name: "Agent Fleet", href: "/agents", icon: Shield },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-const PUBLIC_PATHS = ["/", "/landing", "/pricing", "/services", "/support", "/privacy", "/terms", "/cookies", "/contact", "/login", "/demo"];
-
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const hiddenOnCurrentPath = isPublicPath(pathname);
+  const sessionUser = getSessionUser();
 
   // Hide sidebar on public/auth routes
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) return null;
+  if (hiddenOnCurrentPath) return null;
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <div className="w-64 glass-panel border-r border-white/10 h-screen flex flex-col flex-shrink-0">
@@ -69,6 +79,13 @@ export function Sidebar() {
 
       {/* Footer: Settings + Status */}
       <div className="p-4 border-t border-white/10 space-y-2">
+        {sessionUser && (
+          <div className="glass-panel rounded-md border border-white/5 bg-black/30 px-3 py-3">
+            <p className="truncate text-sm font-semibold text-white">{sessionUser.name}</p>
+            <p className="truncate text-xs text-zinc-500">{sessionUser.email}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.25em] text-cyber-green">{sessionUser.role}</p>
+          </div>
+        )}
         {/* AI Status mini-widget */}
         <div className="glass-panel px-3 py-2 rounded-md flex items-center gap-2 bg-black/20 border border-white/5">
           <div className="relative">
@@ -89,6 +106,15 @@ export function Sidebar() {
           <Settings className="w-4 h-4" />
           <span>Settings</span>
         </Link>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-zinc-500 transition-all duration-200 hover:bg-white/5 hover:text-white"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
 
         {/* System status */}
         <div className="glass-panel p-3 rounded-md flex items-center space-x-3 bg-black/40">

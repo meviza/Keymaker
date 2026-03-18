@@ -6,9 +6,9 @@ import {
     Activity, Database, Cpu, Server, Zap, ShieldCheck, CheckCircle2,
     Clock, AlertTriangle, TrendingUp, Brain, Globe, Wrench, Key, RefreshCw
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import {
     apiService,
@@ -59,11 +59,6 @@ export default function ObservatoryPage() {
     const [roi, setRoi] = useState<ROIMetrics | null>(null)
     const [loading, setLoading] = useState(true)
     const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
-    const [isMounted, setIsMounted] = useState(false)
-
-    useEffect(() => {
-        setIsMounted(true)
-    }, [])
 
     const fetchAll = useCallback(async () => {
         setLoading(true)
@@ -79,7 +74,32 @@ export default function ObservatoryPage() {
         setLoading(false)
     }, [])
 
-    useEffect(() => { fetchAll() }, [fetchAll])
+    useEffect(() => {
+        let cancelled = false
+
+        const load = async () => {
+            const [i, a, r, j, m] = await Promise.all([
+                apiService.getInfraHealth(),
+                apiService.getAIState(),
+                apiService.getRAGHealth(),
+                apiService.getMaintenanceJobs(),
+                apiService.getROIMetrics(),
+            ])
+            if (cancelled) return
+            setInfra(i)
+            setAiState(a)
+            setRag(r)
+            setJobs(j)
+            setRoi(m)
+            setLastRefresh(new Date())
+            setLoading(false)
+        }
+
+        void load()
+        return () => {
+            cancelled = true
+        }
+    }, [])
 
     const modeConfig = aiState ? AI_MODE_CONFIG[aiState.mode] : null
     const ModeIcon = modeConfig?.icon ?? Cpu
@@ -97,7 +117,7 @@ export default function ObservatoryPage() {
                 </div>
                 <Button variant="outline" size="sm" onClick={fetchAll} className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-2">
                     <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-                    {isMounted && lastRefresh ? `Refreshed ${lastRefresh.toLocaleTimeString("tr-TR")}` : "Connecting..."}
+                    {lastRefresh ? `Refreshed ${lastRefresh.toLocaleTimeString("tr-TR")}` : "Connecting..."}
                 </Button>
             </div>
 
@@ -172,21 +192,24 @@ export default function ObservatoryPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {[
-                                { label: "Kafka", detail: `${infra.kafka.topicsActive} topics · ${infra.kafka.messagesPerSec.toLocaleString()} msg/s · ${infra.kafka.lag} lag`, fill: infra.kafka.fillPercent, icon: <Zap className="w-4 h-4 text-yellow-400" /> },
-                                { label: "Redis", detail: `${infra.redis.memoryUsedMb} / ${infra.redis.memoryMaxMb} MB · Queue: ${infra.redis.queueDepth}`, fill: infra.redis.fillPercent, icon: <Activity className="w-4 h-4 text-red-400" /> },
-                                { label: "Qdrant Vectors", detail: `${(infra.qdrant.vectorCount / 1_000_000).toFixed(2)}M / ${(infra.qdrant.vectorMax / 1_000_000).toFixed(1)}M · ${infra.qdrant.collectionCount} collections`, fill: infra.qdrant.fillPercent, icon: <Brain className="w-4 h-4 text-purple-400" /> },
-                                { label: "Elasticsearch", detail: `${infra.elasticsearch.indexSizeGb} GB · ${(infra.elasticsearch.docsIndexed / 1_000_000).toFixed(1)}M docs · ${infra.elasticsearch.shardsActive} shards`, fill: infra.elasticsearch.fillPercent, icon: <Database className="w-4 h-4 text-cyan-400" /> },
-                                { label: "ClickHouse", detail: `${(infra.clickhouse.totalRecords / 1_000_000).toFixed(1)}M records · ${infra.clickhouse.storageUsedTb} TB · synced ${infra.clickhouse.lastSyncMins}m ago`, fill: Math.round(infra.clickhouse.storageUsedTb / 2 * 100), icon: <Database className="w-4 h-4 text-blue-400" /> },
-                            ].map(({ label, detail, fill, icon }) => (
+                                { label: "Kafka", detail: `${infra.kafka.topicsActive} topics · ${infra.kafka.messagesPerSec.toLocaleString()} msg/s · ${infra.kafka.lag} lag`, fill: infra.kafka.fillPercent, icon: Zap, iconClassName: "text-yellow-400" },
+                                { label: "Redis", detail: `${infra.redis.memoryUsedMb} / ${infra.redis.memoryMaxMb} MB · Queue: ${infra.redis.queueDepth}`, fill: infra.redis.fillPercent, icon: Activity, iconClassName: "text-red-400" },
+                                { label: "Qdrant Vectors", detail: `${(infra.qdrant.vectorCount / 1_000_000).toFixed(2)}M / ${(infra.qdrant.vectorMax / 1_000_000).toFixed(1)}M · ${infra.qdrant.collectionCount} collections`, fill: infra.qdrant.fillPercent, icon: Brain, iconClassName: "text-purple-400" },
+                                { label: "Elasticsearch", detail: `${infra.elasticsearch.indexSizeGb} GB · ${(infra.elasticsearch.docsIndexed / 1_000_000).toFixed(1)}M docs · ${infra.elasticsearch.shardsActive} shards`, fill: infra.elasticsearch.fillPercent, icon: Database, iconClassName: "text-cyan-400" },
+                                { label: "ClickHouse", detail: `${(infra.clickhouse.totalRecords / 1_000_000).toFixed(1)}M records · ${infra.clickhouse.storageUsedTb} TB · synced ${infra.clickhouse.lastSyncMins}m ago`, fill: Math.round(infra.clickhouse.storageUsedTb / 2 * 100), icon: Database, iconClassName: "text-blue-400" },
+                            ].map(({ label, detail, fill, icon, iconClassName }) => {
+                                const Icon = icon as LucideIcon
+                                return (
                                 <div key={label} className="space-y-1">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-sm text-zinc-300">{icon}{label}</div>
+                                        <div className="flex items-center gap-2 text-sm text-zinc-300"><Icon className={`w-4 h-4 ${iconClassName}`} />{label}</div>
                                         <span className={`text-sm font-mono font-bold ${fill > 85 ? "text-red-400" : fill > 60 ? "text-amber-400" : "text-emerald-400"}`}>{fill}%</span>
                                     </div>
                                     <FillBar percent={fill} />
                                     <p className="text-xs text-zinc-500">{detail}</p>
                                 </div>
-                            ))}
+                                )
+                            })}
                         </CardContent>
                     </Card>
                 </div>
@@ -254,20 +277,23 @@ export default function ObservatoryPage() {
                         </CardHeader>
                         <CardContent className="grid grid-cols-2 gap-3">
                             {[
-                                { label: "Blocked Today", value: roi.threatsBlockedToday, color: "text-red-400", icon: <ShieldCheck className="w-4 h-4" /> },
-                                { label: "Blocked / Week", value: roi.threatsBlockedWeek, color: "text-orange-400", icon: <ShieldCheck className="w-4 h-4" /> },
-                                { label: "Blocked / Month", value: roi.threatsBlockedMonth.toLocaleString(), color: "text-amber-400", icon: <ShieldCheck className="w-4 h-4" /> },
-                                { label: "CVEs Found", value: roi.cvesDiscovered, color: "text-purple-400", icon: <AlertTriangle className="w-4 h-4" /> },
-                                { label: "Sentinel Stops", value: roi.sentinelInterceptions, color: "text-cyan-400", icon: <CheckCircle2 className="w-4 h-4" /> },
-                                { label: "Auto-Stopped Payloads", value: roi.payloadsAutoStopped, color: "text-emerald-400", icon: <CheckCircle2 className="w-4 h-4" /> },
-                                { label: "Scans Run", value: roi.scansConducted, color: "text-blue-400", icon: <Activity className="w-4 h-4" /> },
-                                { label: "Reports Gen.", value: roi.reportGenerated, color: "text-zinc-300", icon: <Clock className="w-4 h-4" /> },
-                            ].map(({ label, value, color, icon }) => (
+                                { label: "Blocked Today", value: roi.threatsBlockedToday, color: "text-red-400", icon: ShieldCheck },
+                                { label: "Blocked / Week", value: roi.threatsBlockedWeek, color: "text-orange-400", icon: ShieldCheck },
+                                { label: "Blocked / Month", value: roi.threatsBlockedMonth.toLocaleString(), color: "text-amber-400", icon: ShieldCheck },
+                                { label: "CVEs Found", value: roi.cvesDiscovered, color: "text-purple-400", icon: AlertTriangle },
+                                { label: "Sentinel Stops", value: roi.sentinelInterceptions, color: "text-cyan-400", icon: CheckCircle2 },
+                                { label: "Auto-Stopped Payloads", value: roi.payloadsAutoStopped, color: "text-emerald-400", icon: CheckCircle2 },
+                                { label: "Scans Run", value: roi.scansConducted, color: "text-blue-400", icon: Activity },
+                                { label: "Reports Gen.", value: roi.reportGenerated, color: "text-zinc-300", icon: Clock },
+                            ].map(({ label, value, color, icon }) => {
+                                const Icon = icon as LucideIcon
+                                return (
                                 <div key={label} className="glass-panel rounded-md p-3 border border-white/5">
-                                    <div className={`flex items-center gap-1 text-xs mb-1 ${color}`}>{icon}<span>{label}</span></div>
+                                    <div className={`flex items-center gap-1 text-xs mb-1 ${color}`}><Icon className="w-4 h-4" /><span>{label}</span></div>
                                     <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
                                 </div>
-                            ))}
+                                )
+                            })}
                         </CardContent>
                     </Card>
                 )}

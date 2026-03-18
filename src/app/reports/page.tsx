@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   FileText, Download, Loader2, RefreshCw, Shield, AlertTriangle,
-  CheckCircle2, Clock, ChevronDown, ChevronUp, Zap, Users, Code2
+  CheckCircle2, ChevronDown, ChevronUp, Zap, Users, Code2
 } from "lucide-react"
+import { apiService } from "@/lib/api/services"
+import { getToken } from "@/lib/auth/session"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,7 +28,12 @@ interface GenerationJob {
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1"
+const API = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/v1`
+
+function authHeaders(): Record<string, string> {
+  const token = getToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -37,21 +44,6 @@ function fmtDate(iso: string) {
       hour: "2-digit", minute: "2-digit",
     })
   } catch { return iso }
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-    ready: { label: "READY", cls: "text-emerald-400 bg-emerald-400/10 border-emerald-400/30", icon: <CheckCircle2 className="w-3 h-3" /> },
-    generating: { label: "GENERATING", cls: "text-amber-400  bg-amber-400/10  border-amber-400/30", icon: <Loader2 className="w-3 h-3 animate-spin" /> },
-    queued: { label: "QUEUED", cls: "text-cyan-400   bg-cyan-400/10   border-cyan-400/30", icon: <Clock className="w-3 h-3" /> },
-    error: { label: "ERROR", cls: "text-red-400    bg-red-400/10    border-red-400/30", icon: <AlertTriangle className="w-3 h-3" /> },
-  }
-  const s = map[status] ?? map.queued
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-mono font-bold ${s.cls}`}>
-      {s.icon}{s.label}
-    </span>
-  )
 }
 
 function TemplateBadge({ template }: { template: string }) {
@@ -81,17 +73,12 @@ function GenerateModal({ onClose, onJobStarted }: {
   async function handleGenerate() {
     setLoading(true); setError("")
     try {
-      const res = await fetch(`${API}/reports/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template, target, client_name: client, classification: "CONFIDENTIAL" }),
-      })
-      if (!res.ok) throw new Error(await res.text())
-      const data = await res.json()
+      const data = await apiService.generateReport({ target_id: target, template })
+      if (!data.report_id) throw new Error(data.message ?? "Report job id missing")
       onJobStarted({ report_id: data.report_id, status: "queued" })
       onClose()
-    } catch (e: any) {
-      setError(e.message ?? "Generation failed")
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Generation failed")
     } finally {
       setLoading(false)
     }
@@ -260,7 +247,7 @@ function JobBanner({ job, onDone }: { job: GenerationJob; onDone: () => void }) 
     if (status === "ready" || status === "error") return
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`${API}/reports/status/${job.report_id}`)
+        const res = await fetch(`${API}/reports/status/${job.report_id}`, { headers: authHeaders() })
         const data = await res.json()
         setStatus(data.status)
         if (data.filename) setFilename(data.filename)
@@ -271,7 +258,7 @@ function JobBanner({ job, onDone }: { job: GenerationJob; onDone: () => void }) 
       } catch { /* ignore */ }
     }, 2000)
     return () => clearInterval(interval)
-  }, [job.report_id, status])
+  }, [job.report_id, onDone, status])
 
   return (
     <div className={`flex items-center gap-3 p-4 rounded-xl border text-sm
@@ -319,11 +306,17 @@ export default function ReportsPage() {
 
   const fetchReports = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/reports/list`)
-      if (res.ok) {
-        const data = await res.json()
-        setReports(data.reports ?? [])
-      }
+      const data = await apiService.listReports()
+      setReports(
+        (data ?? []).map((item) => ({
+          id: item.id,
+          filename: item.file_path.split("/").pop() ?? `${item.id}.pdf`,
+          template: item.template === "technical" ? "technical" : "executive",
+          target: item.target_id,
+          generated_at: item.generated_at,
+          size_kb: item.size_kb,
+        }))
+      )
     } catch { /* silent */ } finally {
       setLoading(false)
     }
@@ -382,17 +375,21 @@ export default function ReportsPage() {
         {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: "Total Reports", value: reports.length, icon: <FileText className="w-4 h-4" />, color: "text-cyan-400" },
-            { label: "Executive", value: execCount, icon: <Users className="w-4 h-4" />, color: "text-blue-400" },
-            { label: "Technical", value: techCount, icon: <Code2 className="w-4 h-4" />, color: "text-purple-400" },
+            { label: "Total Reports", value: reports.length, icon: FileText, color: "text-cyan-400" },
+            { label: "Executive", value: execCount, icon: Users, color: "text-blue-400" },
+            { label: "Technical", value: techCount, icon: Code2, color: "text-purple-400" },
             {
               label: "Active Jobs", value: jobs.filter(j => j.status !== "ready" && j.status !== "error").length,
-              icon: <Zap className="w-4 h-4" />, color: "text-amber-400"
+              icon: Zap, color: "text-amber-400"
             },
           ].map(({ label, value, icon, color }) => (
             <div key={label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
               <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mb-2 ${color}`}>
-                {icon}{label}
+                {(() => {
+                  const Icon = icon
+                  return <Icon className="w-4 h-4" />
+                })()}
+                {label}
               </div>
               <div className={`text-2xl font-bold font-mono ${color}`}>{value}</div>
             </div>

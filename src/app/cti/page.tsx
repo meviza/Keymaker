@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Globe2, FileSearch, Fingerprint, ShieldAlert, Search,
+  Globe2, FileSearch, ShieldAlert, Search,
   Loader2, RefreshCw, Wifi, WifiOff, Database, Zap, Activity
 } from "lucide-react"
 import {
@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/v1`
 
 type Severity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "INFO"
 
@@ -273,7 +273,7 @@ export default function CTIPage() {
                 Semantic Intelligence Search
               </CardTitle>
               <CardDescription className="text-zinc-500 text-xs">
-                Powered by Qdrant vector similarity · try "OpenSSH RCE Linux" or "ransomware C2 domain"
+                Powered by Qdrant vector similarity · try &quot;OpenSSH RCE Linux&quot; or &quot;ransomware C2 domain&quot;
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -304,7 +304,7 @@ export default function CTIPage() {
               </div>
               {searchResults !== null && (
                 <div className="text-xs text-zinc-500">
-                  {searchResults.length} semantic matches for <span className="text-purple-400 font-mono">"{searchQuery}"</span>
+                  {searchResults.length} semantic matches for <span className="text-purple-400 font-mono">&quot;{searchQuery}&quot;</span>
                 </div>
               )}
             </CardContent>

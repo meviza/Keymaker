@@ -2,34 +2,36 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Key, Lock, Eye, EyeOff, ChevronRight, Shield, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { login, storeToken } from "@/lib/auth/authService"
+import { login, setOfflineDemoSession } from "@/lib/auth/authService"
+import { resolvePostLoginPath } from "@/lib/auth/access"
 
 export default function LoginPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const nextPath = resolvePostLoginPath(searchParams.get("next"))
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
         setLoading(true)
         try {
-            const data = await login(email, password)
-            storeToken(data.access_token)
-            router.push("/command")
+            await login(email, password)
+            router.push(nextPath)
         } catch (err) {
             const msg = err instanceof Error ? err.message : "Login failed"
             // Graceful fallback: if backend unreachable, allow demo access
             if (msg.toLowerCase().includes("fetch") || msg.toLowerCase().includes("failed to fetch")) {
-                storeToken("demo-token-offline")
-                router.push("/command")
+                setOfflineDemoSession()
+                router.push(nextPath)
             } else {
                 setError(msg)
                 setLoading(false)

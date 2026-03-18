@@ -1,19 +1,20 @@
 "use client";
 
 import {
-  Activity,
   ChevronDown,
   Clock,
   Cpu,
   Crosshair,
-  Database,
+  FileCheck2,
   Filter,
   Network,
+  ShieldCheck,
   Terminal,
   Zap,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiService, type LiveFeedItem, type SystemStatus } from "@/lib/api/services";
+import { sanitizeTarget, isValidTarget } from "@/lib/sanitize";
 
 function LiveClock() {
   const [time, setTime] = useState("");
@@ -63,7 +64,9 @@ export default function CommandShell() {
   const [prediction, setPrediction] = useState<{ cve: string; probability: number; level: string } | null>(null);
   const [targetHistory, setTargetHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const statsUpdatedAt = useRef<Date>(new Date());
+  const [environmentReadiness, setEnvironmentReadiness] = useState<{ ready_count: number; total_count: number } | null>(null);
+  const [executiveSnapshot, setExecutiveSnapshot] = useState<Record<string, unknown> | null>(null);
+  // statsUpdatedAt removed — was write-only
 
   useEffect(() => {
     const load = async () => {
@@ -74,11 +77,16 @@ export default function CommandShell() {
           apiService.getLiveFeed(),
           apiService.getTargets(),
         ]);
+        const [env, executive] = await Promise.all([
+          apiService.getEnvironmentReadiness(),
+          apiService.getExecutiveSnapshot("default-enterprise").catch(() => null),
+        ]);
         setSystemStatus(status);
         setThreatStats(threats);
         setLiveFeed(feed.slice(0, 30));
         setTargets(targetList.map((t) => ({ id: t.id, name: t.name, url: t.url, type: t.type })));
-        statsUpdatedAt.current = new Date();
+        setEnvironmentReadiness(env);
+        setExecutiveSnapshot(executive);
         setLastUpdated((prev) => ({ ...prev, stats: new Date() }));
       } catch {}
     };
@@ -90,10 +98,15 @@ export default function CommandShell() {
     return () => unsub();
   }, []);
 
-  const filteredFeed = feedFilter === "ALL" ? liveFeed : liveFeed.filter((e) => (e.source || "").includes(feedFilter));
+  const filteredFeed = useMemo(
+    () => feedFilter === "ALL" ? liveFeed : liveFeed.filter((e) => (e.source || "").includes(feedFilter)),
+    [liveFeed, feedFilter]
+  );
 
   const handleEngage = async () => {
-    if (!target.trim()) return;
+    const cleanTarget = sanitizeTarget(target);
+    if (!cleanTarget || !isValidTarget(cleanTarget)) return;
+    setTarget(cleanTarget);
     setIsScanning(true);
     setTargetHistory((prev) => [target, ...prev.filter((t) => t !== target)].slice(0, 5));
     setShowHistory(false);
@@ -127,7 +140,7 @@ export default function CommandShell() {
         try {
           const pred = await apiService.predictCVE("CVE-2024-6387", 8.1);
           if (pred?.prediction) {
-            setPrediction({ cve: pred.cve_id, probability: pred.prediction.probability, level: pred.prediction.threat_level });
+            setPrediction({ cve: pred.cve_id ?? "CVE-2024-6387", probability: pred.prediction.probability, level: pred.prediction.threat_level });
             injectFeed(
               `AI Prediction: CVE-2024-6387 exploitability ${(pred.prediction.probability * 100).toFixed(0)}% - ${pred.prediction.threat_level}`,
               "warning",
@@ -171,19 +184,19 @@ export default function CommandShell() {
       updatedAt: prediction ? new Date() : undefined,
     },
     {
-      title: "Kernel Visibility",
-      value: "ACTIVE",
-      sub: "eBPF EDR engaged",
-      icon: Database,
-      color: "cyber-blue",
+      title: "Env Secrets",
+      value: environmentReadiness ? `${environmentReadiness.ready_count}/${environmentReadiness.total_count}` : "-",
+      sub: "Integration secret coverage",
+      icon: ShieldCheck,
+      color: environmentReadiness && environmentReadiness.ready_count === environmentReadiness.total_count ? "cyber-green" : "cyber-yellow",
       updatedAt: undefined,
     },
     {
-      title: "Active Scans",
-      value: threatStats.find((t) => t.label === "Scans Running")?.value?.toString() || "0",
-      sub: "Reconnaissance phase",
-      icon: Activity,
-      color: "cyber-green",
+      title: "Evidence State",
+      value: Array.isArray(executiveSnapshot?.metrics) ? String((executiveSnapshot?.metrics as Array<Record<string, unknown>>).length) : "0",
+      sub: "Executive snapshot metrics",
+      icon: FileCheck2,
+      color: "cyber-blue",
       updatedAt: lastUpdated.stats,
     },
   ];
@@ -321,6 +334,39 @@ export default function CommandShell() {
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-cyber-green/10 to-transparent opacity-0 group-hover:opacity-100 animate-scanline pointer-events-none" />
           </button>
+        </div>
+
+        <div className="glass-panel rounded-xl border border-white/10 p-8">
+          <h2 className="mb-6 flex items-center gap-2 text-xl font-bold uppercase tracking-wider text-white">
+            <Network className="h-5 w-5 text-cyber-blue" />
+            Enterprise Posture
+          </h2>
+          <div className="space-y-4">
+            <div className="rounded-xl border border-white/10 bg-black/30 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Environment</p>
+              <p className="mt-2 text-2xl font-bold text-white">
+                {environmentReadiness ? `${environmentReadiness.ready_count}/${environmentReadiness.total_count}` : "--"}
+              </p>
+              <p className="mt-1 text-sm text-zinc-400">Configured secret references</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/30 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Executive Snapshot</p>
+              <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-zinc-300">
+                {JSON.stringify(executiveSnapshot ?? { status: "pending" }, null, 2)}
+              </pre>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/30 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Threat Index</p>
+              <div className="mt-3 space-y-2">
+                {threatStats.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between text-sm text-zinc-300">
+                    <span>{item.label}</span>
+                    <span className="font-mono text-white">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="lg:col-span-2 glass-panel p-8 rounded-xl flex flex-col relative overflow-hidden">

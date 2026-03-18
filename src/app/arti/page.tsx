@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface LogEntry {
     timestamp: string;
@@ -171,7 +173,17 @@ function FindingDetail({ finding, onClose }: { finding: Finding; onClose: () => 
 }
 
 // ─── Status Card ──────────────────────────────────────────────────────────────
-function StatusCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: any; color: string }) {
+function StatusCard({
+    icon,
+    label,
+    value,
+    color,
+}: {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number;
+    color: string;
+}) {
     return (
         <div className="glass-panel p-4 border border-white/10 flex flex-col justify-center gap-1 hover:border-white/20 transition-all">
             <div className="flex items-center gap-2 text-zinc-500">
@@ -197,7 +209,7 @@ export default function ARTiPage() {
         if (!isActive) return;
         const id = setInterval(async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/v1/arti/status/${target}`);
+                const res = await fetch(`${API_BASE}/api/v1/arti/status/${target}`);
                 if (!res.ok) return;
                 const data: ARTiStatus = await res.json();
                 setStatus(data);
@@ -215,7 +227,7 @@ export default function ARTiPage() {
     const startARTi = async () => {
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:8000/api/v1/arti/start", {
+            const res = await fetch(`${API_BASE}/api/v1/arti/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ target }),
@@ -225,7 +237,7 @@ export default function ARTiPage() {
     };
 
     const stopARTi = async () => {
-        await fetch(`http://localhost:8000/api/v1/arti/stop/${target}`, { method: "POST" });
+        await fetch(`${API_BASE}/api/v1/arti/stop/${target}`, { method: "POST" });
         setIsActive(false);
     };
 

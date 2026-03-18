@@ -6,7 +6,6 @@ import { Scale, ShieldAlert, CheckCircle, XCircle, AlertTriangle, Key } from "lu
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
