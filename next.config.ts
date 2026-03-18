@@ -1,19 +1,13 @@
-import path from "path";
 import type { NextConfig } from "next";
 
-const projectRoot = path.join(__dirname, "..");
+const isGhPages = process.env.NEXT_PUBLIC_BASE_PATH === "/Keymaker";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  outputFileTracingRoot: projectRoot,
-  turbopack: {
-    root: projectRoot,
-  },
-  // Skip static prerendering for dynamic pages
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "2mb",
-    },
+  output: "export",
+  basePath: isGhPages ? "/Keymaker" : "",
+  assetPrefix: isGhPages ? "/Keymaker/" : undefined,
+  images: {
+    unoptimized: true,
   },
 };
 
